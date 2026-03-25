@@ -188,7 +188,7 @@ export default function FichePage() {
     alsace_moselle: userData?.alsace_moselle || false,
     cotisations_config: COTISATIONS_2026,
     indemnites: {
-      ie_base: moisData.ie_base || 0,
+      ie_base: moisData.ie_base || enfant.indemnite_entretien_jour || 0,
       ie_nombre: joursEffectifsTravailles,
       ie_comp_base: moisData.ie_comp_base || 0,
       ie_comp_nombre: moisData.ie_comp_nombre || 0,
@@ -302,8 +302,8 @@ export default function FichePage() {
         majoration_sup={moisData.majoration_sup ?? 0.25}
         heures_comp_base={moisData.heures_comp_base || 0}
         heures_sup_base={moisData.heures_sup_base || 0}
-        absence_enfant_heures={moisData.absence_enfant_heures || 0}
-        absence_salarie_heures={moisData.absence_salarie_heures || 0}
+        absence_enfant_heures={absences.heures_abs_enfant}
+        absence_salarie_heures={absences.heures_abs_salarie}
         taux_deduction_enfant={taux}
         taux_deduction_salarie={taux}
         prime_precarite_base={moisData.prime_precarite_base || 0}
@@ -324,7 +324,7 @@ export default function FichePage() {
         total_heures_contrac={totalHeuresContrac + totalHeures}
         salaire_net_social={bulletin.net.salaire_net_social}
         indemnites={{
-          ie_base: moisData.ie_base || 0,
+          ie_base: moisData.ie_base || enfant.indemnite_entretien_jour || 0,
           ie_nombre: joursEffectifsTravailles,
           g52: bulletin.indemnites.g52,
           ie_comp_base: moisData.ie_comp_base || 0,
