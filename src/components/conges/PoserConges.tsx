@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { poserCongesPeriode } from "@/lib/firestore";
 import { MOIS_NOMS, getDaysInMonth } from "@/lib/utils";
+import { showToast } from "@/components/Toast";
 
 interface PoserCongesProps {
   uid: string;
@@ -60,7 +61,10 @@ export default function PoserConges({
       planningType
     );
     setSaving(false);
-    setResult(`${count} jour${count > 1 ? "s" : ""} de ${code === "CPC" ? "CPc" : "CPi"} posé${count > 1 ? "s" : ""}`);
+    const label = code === "CPC" ? "CPc" : code === "CPI" ? "CPi" : "CSS";
+    const msg = `${count} jour${count > 1 ? "s" : ""} de ${label} posé${count > 1 ? "s" : ""}`;
+    setResult(msg);
+    showToast(msg);
     onCongesPoses(annee, mois, count);
   }
 

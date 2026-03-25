@@ -18,6 +18,7 @@ import {
   disableDaily,
   getNotificationPermission,
 } from "@/lib/notifications";
+import { showToast } from "@/components/Toast";
 
 const COTISATION_LABELS: Record<keyof CotisationsConfig, string> = {
   securite_sociale_salariale: "Sécu. sociale salariale",
@@ -130,6 +131,7 @@ export default function ParametresPage() {
       alsace_moselle: alsaceMoselle,
     });
     setSaving(false);
+    showToast("Profil enregistré");
   }
 
   async function handleSaveCotisations() {
@@ -145,6 +147,7 @@ export default function ParametresPage() {
       evaluation_repas: evaluationRepas,
     });
     setSaving(false);
+    showToast("Taux et minimums enregistrés");
   }
 
   function updateCotisation(key: keyof CotisationsConfig, value: number) {

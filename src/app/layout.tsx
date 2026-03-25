@@ -3,6 +3,7 @@ import "./globals.css";
 import { AuthProvider } from "@/lib/auth-context";
 import { Navigation } from "@/components/Navigation";
 import { NotificationChecker } from "@/components/NotificationChecker";
+import { ToastProvider } from "@/components/Toast";
 
 export const metadata: Metadata = {
   title: "AssMatPaie — Bulletins de paie Assistante Maternelle",
@@ -24,6 +25,7 @@ export default function RootLayout({
           </main>
           <Navigation />
           <NotificationChecker />
+          <ToastProvider />
         </AuthProvider>
       </body>
     </html>

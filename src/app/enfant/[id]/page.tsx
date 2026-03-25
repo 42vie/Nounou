@@ -9,6 +9,7 @@ import { getEnfant, saveEnfant, deleteEnfant, Enfant } from "@/lib/firestore";
 import { Timestamp } from "firebase/firestore";
 import TableauCP from "@/components/conges/TableauCP";
 import PoserConges from "@/components/conges/PoserConges";
+import { showToast } from "@/components/Toast";
 
 export default function EnfantPage() {
   const { user } = useAuth();
@@ -133,6 +134,7 @@ export default function EnfantPage() {
     setSaving(false);
     setSavedMsg(true);
     setTimeout(() => setSavedMsg(false), 3000);
+    showToast("Contrat enregistré avec succès");
   }
 
   async function handleDelete() {

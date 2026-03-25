@@ -7,6 +7,7 @@ import { MOIS_NOMS, JOURS_SEMAINE, getDaysInMonth } from "@/lib/utils";
 import { getJoursFeriesMap } from "@/lib/constants/feries";
 import GrilleCode from "./GrilleCode";
 import RecapMois from "./RecapMois";
+import { showToast } from "@/components/Toast";
 
 // ============ Types ============
 
@@ -239,6 +240,7 @@ export default function PopupJour({
       commentaire: selectedCode,
     };
     onSave(jour, enfant.id, data);
+    showToast(`Jour ${jour} enregistré`);
   }, [enfant, selectedCode, heures, heuresComp, heuresSup, heuresContrac, repas, jour, onSave, colLActive, colOActive, colMNActive]);
 
   // Save and go to next weekday
