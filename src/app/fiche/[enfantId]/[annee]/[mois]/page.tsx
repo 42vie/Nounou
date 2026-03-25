@@ -370,7 +370,7 @@ export default function FichePage() {
         absence_enfant_heures={absences.heures_abs_enfant}
         absence_salarie_heures={absences.heures_abs_salarie}
         taux_deduction_enfant={taux}
-        taux_deduction_salarie={absences.unites_potentiel > 0 ? Math.round(salaireMensualise / absences.unites_potentiel * 100) / 100 : taux}
+        taux_deduction_salarie={taux}
         prime_precarite_base={moisData.prime_precarite_base || 0}
         jours={Object.fromEntries(
           Object.entries(moisData.jours || {}).map(([k, v]) => [k, {
