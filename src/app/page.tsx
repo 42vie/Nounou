@@ -33,6 +33,8 @@ export default function DashboardPage() {
   const [showPopup, setShowPopup] = useState(false);
   const [moisData, setMoisData] = useState<MoisData | null>(null);
   const [selectedEnfant, setSelectedEnfant] = useState<string>("");
+  const [allMoisData, setAllMoisData] = useState<Record<string, MoisData>>({});
+  const [cpExpanded, setCpExpanded] = useState(true);
 
   useEffect(() => {
     if (!loading && !user) {
@@ -65,6 +67,26 @@ export default function DashboardPage() {
       });
     }
   }, [user, selectedEnfant, enfants]);
+
+  // Load mois data for all enfants (for CP widget)
+  useEffect(() => {
+    if (user && enfants.length > 0) {
+      const now = new Date();
+      const year = now.getFullYear();
+      const month = now.getMonth();
+      Promise.all(
+        enfants.map(async (enf) => {
+          const d = await getMoisData(user.uid, enf.id!, year, month);
+          const data = d || defaultMoisData(enf.id!, year, month, enf);
+          return [enf.id!, data] as [string, MoisData];
+        })
+      ).then((results) => {
+        const map: Record<string, MoisData> = {};
+        for (const [id, data] of results) map[id] = data;
+        setAllMoisData(map);
+      });
+    }
+  }, [user, enfants]);
 
   async function handleEnableNotif() {
     const granted = await requestNotificationPermission();
@@ -207,6 +229,93 @@ export default function DashboardPage() {
           </div>
         )}
       </div>
+
+      {/* Congés payés tracking */}
+      {enfants.length > 0 && (
+        <div>
+          <button
+            onClick={() => setCpExpanded(!cpExpanded)}
+            className="flex items-center gap-2 w-full text-left mb-3"
+          >
+            <h2 className="text-lg font-bold text-gray-900">
+              Congés payés
+            </h2>
+            <svg
+              className={`w-4 h-4 text-gray-500 transition-transform ${cpExpanded ? "rotate-180" : ""}`}
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+            </svg>
+          </button>
+          {cpExpanded && (
+            <div className="grid gap-3 md:grid-cols-2">
+              {enfants.map((enfant) => {
+                const md = allMoisData[enfant.id!];
+                const soldeInitial = enfant.cp_solde_initial || 0;
+                // Count conge days from jours data
+                const joursConge = md
+                  ? Object.values(md.jours).filter((j) => j.type === "conge").length
+                  : 0;
+                // Use MoisData CP fields
+                const cpAcquis = md ? (md.cp_n_jours_enfant || 0) : 0;
+                const cpPris = joursConge;
+                const solde = soldeInitial + cpAcquis - cpPris;
+                const totalDispo = soldeInitial + cpAcquis;
+                const pctUsed = totalDispo > 0 ? Math.min((cpPris / totalDispo) * 100, 100) : 0;
+
+                return (
+                  <div
+                    key={enfant.id}
+                    className="bg-white rounded-xl border p-4"
+                  >
+                    <div className="flex justify-between items-start mb-3">
+                      <h3 className="font-bold text-gray-900">{enfant.nom}</h3>
+                      <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-purple-100 text-purple-700">
+                        Solde : {solde} j
+                      </span>
+                    </div>
+                    <div className="space-y-1.5 text-sm text-gray-600">
+                      <div className="flex justify-between">
+                        <span>Solde initial</span>
+                        <span className="font-medium text-gray-900">{soldeInitial} j</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>CP acquis (mois)</span>
+                        <span className="font-medium text-green-700">+{cpAcquis} j</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>CP pris (mois)</span>
+                        <span className="font-medium text-red-600">-{cpPris} j</span>
+                      </div>
+                    </div>
+                    {/* Progress bar */}
+                    <div className="mt-3">
+                      <div className="flex justify-between text-xs text-gray-400 mb-1">
+                        <span>Utilisation</span>
+                        <span>{Math.round(pctUsed)}%</span>
+                      </div>
+                      <div className="w-full h-2 bg-purple-100 rounded-full overflow-hidden">
+                        <div
+                          className="h-full bg-purple-500 rounded-full transition-all"
+                          style={{ width: `${pctUsed}%` }}
+                        />
+                      </div>
+                    </div>
+                    <Link
+                      href={`/conges/${enfant.id}`}
+                      className="inline-block mt-3 text-xs text-purple-600 font-medium hover:text-purple-800"
+                    >
+                      Voir détail →
+                    </Link>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Popup saisie du jour */}
       {showPopup && moisData && enfants.length > 0 && (
