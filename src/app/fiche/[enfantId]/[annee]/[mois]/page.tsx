@@ -11,9 +11,11 @@ import {
   getUserData,
   defaultMoisData,
   getMoisDataForYear,
+  getCPTableau,
   Enfant,
   MoisData,
   UserData,
+  CPMoisEntry,
 } from "@/lib/firestore";
 import { MOIS_NOMS, getDaysInMonth } from "@/lib/utils";
 import { calculerBulletinComplet } from "@/lib/calculs/fiche-complete";
@@ -34,16 +36,19 @@ export default function FichePage() {
   const [moisData, setMoisData] = useState<MoisData | null>(null);
   const [userData, setUserData] = useState<UserData | null>(null);
   const [cumulData, setCumulData] = useState<{ netImposable: number; ieInIk: number }>({ netImposable: 0, ieInIk: 0 });
+  const [cpTableau, setCpTableau] = useState<CPMoisEntry[]>([]);
 
   const loadData = useCallback(async () => {
     if (!user) return;
-    const [e, m, u] = await Promise.all([
+    const [e, m, u, cpData] = await Promise.all([
       getEnfant(user.uid, enfantId),
       getMoisData(user.uid, enfantId, annee, moisIdx),
       getUserData(user.uid),
+      getCPTableau(user.uid, enfantId),
     ]);
     setEnfant(e);
     setUserData(u);
+    setCpTableau(cpData);
     if (m) {
       setMoisData(m);
     } else if (e) {
@@ -206,10 +211,11 @@ export default function FichePage() {
   const cpNStart = embauche > cpNDebut ? embauche : cpNDebut;
   const cpNMoisTrav = Math.max(0, (annee * 12 + moisIdx) - (cpNStart.getFullYear() * 12 + cpNStart.getMonth()) + 1);
   const cpNSemTrav = Math.round(cpNMoisTrav * (enfant.semaines_programmees / 12));
-  let cpNPris = 0;
-  Object.values(moisData.jours || {}).forEach((j) => {
-    if (j.commentaire === "CPC" || j.commentaire === "CPI") cpNPris++;
-  });
+  // CP pris = total de la collection CP (tous les mois de la période)
+  const cpNPris = cpTableau.reduce(
+    (sum, entry) => sum + (entry.cpc_pris || 0) + (entry.cpi_pris || 0),
+    0
+  );
   const cpSoldeInitial = enfant.cp_solde_initial || 0;
 
   // Calcul complet
@@ -418,9 +424,9 @@ export default function FichePage() {
           mois_trav: cpNMoisTrav,
           sem_trav: cpNSemTrav,
           jours_enfant: moisData.cp_n_jours_enfant || 0,
-          jours_acquis: bulletin.conges_n.jours_acquis + cpSoldeInitial,
+          jours_acquis: Math.min(Math.round(cpNMoisTrav * 2.5 * 100) / 100, 30),
           jours_pris: cpNPris,
-          solde: bulletin.conges_n.jours_acquis + cpSoldeInitial - cpNPris,
+          solde: Math.round((cpSoldeInitial + Math.min(cpNMoisTrav * 2.5, 30) - cpNPris) * 100) / 100,
         }}
         conges_n1={{
           periode: cpN1Periode,
