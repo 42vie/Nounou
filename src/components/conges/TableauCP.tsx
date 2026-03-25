@@ -78,7 +78,7 @@ export default function TableauCP({
     totalAcquis += acquisParMois;
   });
   totalAcquis = Math.round(totalAcquis * 100) / 100;
-  const solde = Math.min(cpSoldeInitial + totalAcquis - totalCpc - totalCpi, 30);
+  const solde = Math.round(Math.min(cpSoldeInitial + totalAcquis - totalCpc - totalCpi, 30) * 100) / 100;
 
   // Modifier un mois
   async function handleUpdate(annee: number, mois: number, field: "cpc_pris" | "cpi_pris", value: number) {
@@ -148,7 +148,7 @@ export default function TableauCP({
                 const e = getCPForMois(m.annee, m.mois);
                 return sum + (anneeComplete ? (e?.cpc_pris || 0) : (e?.cpi_pris || 0));
               }, 0);
-              const cumulSolde = cpSoldeInitial + cumulAcquis - cumulPris;
+              const cumulSolde = Math.round((cpSoldeInitial + cumulAcquis - cumulPris) * 100) / 100;
               const isCurrent = annee === anneeCourante && mois === moisCourant;
 
               return (
