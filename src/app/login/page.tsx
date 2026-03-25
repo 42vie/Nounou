@@ -37,7 +37,7 @@ export default function LoginPage() {
       <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-8">
         <div className="text-center mb-8">
           <Image
-            src="/logo-assmatpaie.svg"
+            src="/logo-assmatpaie.png"
             alt="AssMatPaie"
             width={80}
             height={80}

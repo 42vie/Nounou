@@ -25,7 +25,7 @@ export function Navigation() {
         <div className="p-4 border-b">
           <Link href="/" className="flex items-center gap-2">
             <Image
-              src="/logo-assmatpaie.svg"
+              src="/logo-assmatpaie.png"
               alt="AssMatPaie"
               width={40}
               height={40}
