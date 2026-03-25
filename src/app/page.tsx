@@ -108,8 +108,7 @@ export default function DashboardPage() {
   const prenom = userData?.nom ? userData.nom.split(" ").pop() ?? "" : "";
 
   return (
-    /* Cancel the parent p-4 padding for full-bleed header */
-    <div className="-mx-4 -mt-4" style={{ background: "#FAF0E6", minHeight: "100vh" }}>
+    <div style={{ background: "#FAF0E6", minHeight: "100vh" }}>
 
       {/* ===== HEADER ===== */}
       <div className="relative overflow-hidden px-5 pt-8 pb-20" style={{ background: "#F5E6D0" }}>
