@@ -10,6 +10,7 @@ import {
   getMoisData,
   saveMoisData,
   saveJourData,
+  saveCPMois,
   defaultMoisData,
   Enfant,
   MoisData,
@@ -222,6 +223,16 @@ export default function MoisPage() {
               if (!prev) return prev;
               return { ...prev, jours: { ...prev.jours, [String(jour)]: data } };
             });
+            // Si CPC/CPI, mettre à jour le tableau CP de l'enfant
+            if (data.commentaire === "CPC" || data.commentaire === "CPI") {
+              const updatedJours = { ...(moisData?.jours || {}), [String(jour)]: data };
+              const cpcCount = Object.values(updatedJours).filter((j) => j.commentaire === "CPC").length;
+              const cpiCount = Object.values(updatedJours).filter((j) => j.commentaire === "CPI").length;
+              await saveCPMois(user.uid, enfantId, annee, moisIdx, {
+                cpc_pris: cpcCount,
+                cpi_pris: cpiCount,
+              });
+            }
           }}
           onChangeEnfant={(id) => setSelectedEnfant(id)}
           onChangeJour={(jour) => setPopupJour(jour)}

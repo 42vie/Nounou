@@ -7,6 +7,8 @@ import { useRouter, useParams } from "next/navigation";
 import { useAuth } from "@/lib/auth-context";
 import { getEnfant, saveEnfant, deleteEnfant, Enfant } from "@/lib/firestore";
 import { Timestamp } from "firebase/firestore";
+import TableauCP from "@/components/conges/TableauCP";
+import PoserConges from "@/components/conges/PoserConges";
 
 export default function EnfantPage() {
   const { user } = useAuth();
@@ -344,12 +346,47 @@ export default function EnfantPage() {
               <div className="font-bold">Bulletin du mois</div>
             </a>
             <a
-              href={`/conges/${id}`}
+              href={`/rupture/${id}`}
               className="bg-white border rounded-xl p-4 text-center hover:bg-gray-50"
             >
-              <div className="font-bold text-gray-900">Congés payés</div>
+              <div className="font-bold text-gray-900">Fin de contrat</div>
             </a>
           </div>
+
+          {/* Poser des congés */}
+          {user && (
+            <PoserConges
+              uid={user.uid}
+              enfantId={id}
+              enfantNom={enfant.nom}
+              anneeComplete={enfant.annee_complete}
+              planningType={enfant.planning_type || {}}
+              onCongesPoses={() => {
+                // Recharger le tableau CP
+                window.location.reload();
+              }}
+            />
+          )}
+
+          {/* Tableau CP */}
+          {user && (
+            <TableauCP
+              uid={user.uid}
+              enfantId={id}
+              enfantNom={enfant.nom}
+              dateEmbauche={
+                enfant.date_embauche?.toDate?.()
+                  ? enfant.date_embauche.toDate()
+                  : new Date(2024, 0, 1)
+              }
+              semaineProgrammees={enfant.semaines_programmees}
+              anneeComplete={enfant.annee_complete}
+              cpSoldeInitial={enfant.cp_solde_initial || 0}
+              cpSoldeInitialDate={enfant.cp_solde_initial_date || ""}
+              anneeCourante={now.getFullYear()}
+              moisCourant={now.getMonth()}
+            />
+          )}
         </div>
       )}
     </div>
