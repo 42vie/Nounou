@@ -18,6 +18,7 @@ import {
 import { MOIS_NOMS, formatEuro, getDaysInMonth } from "@/lib/utils";
 import { CalendrierMois } from "@/components/calendrier/CalendrierMois";
 import { calculerMensualisation } from "@/lib/calculs/mensualisation";
+import { getHeuresContratJour } from "@/lib/planning-utils";
 import PopupJour from "@/components/saisie/PopupJour";
 
 export default function MoisPage() {
@@ -65,17 +66,15 @@ export default function MoisPage() {
   function handleApplyPlanning() {
     if (!enfant || !moisData) return;
     const nbJours = getDaysInMonth(annee, moisIdx);
-    const joursSemaine = [
-      "dimanche", "lundi", "mardi", "mercredi", "jeudi", "vendredi", "samedi",
-    ];
     const newJours = { ...moisData.jours };
 
     for (let j = 1; j <= nbJours; j++) {
       if (newJours[String(j)]) continue; // Ne pas écraser les jours déjà saisis
       const date = new Date(annee, moisIdx, j);
-      const jourKey = joursSemaine[date.getDay()];
-      const heures =
-        enfant.planning_type?.[jourKey as keyof typeof enfant.planning_type] || 0;
+      // Skip week-ends
+      if (date.getDay() === 0 || date.getDay() === 6) continue;
+      // Utilise le planning paire/impaire si activé
+      const heures = getHeuresContratJour(enfant, annee, moisIdx, j);
       if (heures > 0) {
         newJours[String(j)] = {
           type: "work",

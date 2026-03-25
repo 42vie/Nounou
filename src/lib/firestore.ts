@@ -56,6 +56,15 @@ export interface Enfant {
     vendredi: number;
     samedi: number;
   };
+  planning_alterne: boolean; // true = planning paire/impaire
+  planning_type_impaire?: {  // Planning semaine impaire (si alterne)
+    lundi: number;
+    mardi: number;
+    mercredi: number;
+    jeudi: number;
+    vendredi: number;
+    samedi: number;
+  };
   methode_absence: "heures" | "jours" | "minoration_cassation";
   jours_pajemploi_contrat: number; // Nb jours à déclarer à Pajemploi (variable du contrat)
   cp_solde_initial: number;        // Solde CP au démarrage (ex: 10 jours au 1er janvier 2026)
