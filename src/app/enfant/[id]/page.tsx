@@ -307,6 +307,23 @@ export default function EnfantPage() {
             </select>
           </section>
 
+          {/* Pajemploi & Congés */}
+          <section className="bg-white rounded-xl border p-4 space-y-3">
+            <h2 className="font-bold text-purple-900 border-b pb-2">Pajemploi & Congés payés</h2>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Nombre de jours à déclarer à Pajemploi</label>
+              <input type="number" value={form.jours_pajemploi_contrat as number || ""} onChange={(e) => update("jours_pajemploi_contrat", parseInt(e.target.value) || 0)} className="w-full border rounded-lg p-2.5 text-sm" placeholder="Ex: 20" />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Solde initial de congés payés (jours)</label>
+              <input type="number" step="0.5" value={form.cp_solde_initial as number || ""} onChange={(e) => update("cp_solde_initial", parseFloat(e.target.value) || 0)} className="w-full border rounded-lg p-2.5 text-sm" placeholder="Ex: 10" />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Date de référence du solde initial</label>
+              <input type="date" value={form.cp_solde_initial_date as string} onChange={(e) => update("cp_solde_initial_date", e.target.value)} className="w-full border rounded-lg p-2.5 text-sm" />
+            </div>
+          </section>
+
           <button
             onClick={handleDelete}
             className="w-full py-3 text-red-600 border border-red-200 rounded-xl text-sm hover:bg-red-50"

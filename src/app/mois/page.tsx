@@ -336,7 +336,7 @@ export default function MoisPage() {
             </div>
             <div>
               <label className="block text-xs font-medium text-gray-600 mb-1">
-                Jours Pajemploi
+                Jours à déclarer Pajemploi
               </label>
               <input
                 type="number"
@@ -345,7 +345,13 @@ export default function MoisPage() {
                   handleSaveRemuneration("jours_pajemploi", parseInt(e.target.value) || 0)
                 }
                 className="w-full border rounded-lg p-2 text-sm"
+                placeholder={`Contrat: ${enfant?.jours_pajemploi_contrat || 0}`}
               />
+              {enfant?.jours_pajemploi_contrat ? (
+                <p className="text-[10px] text-gray-400 mt-0.5">
+                  Valeur contrat : {enfant.jours_pajemploi_contrat} jrs (modifiable par mois)
+                </p>
+              ) : null}
             </div>
             <div>
               <label className="block text-xs font-medium text-gray-600 mb-1">
