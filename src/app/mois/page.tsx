@@ -18,6 +18,7 @@ import {
 import { MOIS_NOMS, formatEuro, getDaysInMonth } from "@/lib/utils";
 import { CalendrierMois } from "@/components/calendrier/CalendrierMois";
 import { calculerMensualisation } from "@/lib/calculs/mensualisation";
+import { getHeuresContratJour } from "@/lib/planning-utils";
 import PopupJour from "@/components/saisie/PopupJour";
 
 export default function MoisPage() {
@@ -65,17 +66,15 @@ export default function MoisPage() {
   function handleApplyPlanning() {
     if (!enfant || !moisData) return;
     const nbJours = getDaysInMonth(annee, moisIdx);
-    const joursSemaine = [
-      "dimanche", "lundi", "mardi", "mercredi", "jeudi", "vendredi", "samedi",
-    ];
     const newJours = { ...moisData.jours };
 
     for (let j = 1; j <= nbJours; j++) {
       if (newJours[String(j)]) continue; // Ne pas écraser les jours déjà saisis
       const date = new Date(annee, moisIdx, j);
-      const jourKey = joursSemaine[date.getDay()];
-      const heures =
-        enfant.planning_type?.[jourKey as keyof typeof enfant.planning_type] || 0;
+      // Skip week-ends
+      if (date.getDay() === 0 || date.getDay() === 6) continue;
+      // Utilise le planning paire/impaire si activé
+      const heures = getHeuresContratJour(enfant, annee, moisIdx, j);
       if (heures > 0) {
         newJours[String(j)] = {
           type: "work",
@@ -337,7 +336,7 @@ export default function MoisPage() {
             </div>
             <div>
               <label className="block text-xs font-medium text-gray-600 mb-1">
-                Jours Pajemploi
+                Jours à déclarer Pajemploi
               </label>
               <input
                 type="number"
@@ -346,7 +345,13 @@ export default function MoisPage() {
                   handleSaveRemuneration("jours_pajemploi", parseInt(e.target.value) || 0)
                 }
                 className="w-full border rounded-lg p-2 text-sm"
+                placeholder={`Contrat: ${enfant?.jours_pajemploi_contrat || 0}`}
               />
+              {enfant?.jours_pajemploi_contrat ? (
+                <p className="text-[10px] text-gray-400 mt-0.5">
+                  Valeur contrat : {enfant.jours_pajemploi_contrat} jrs (modifiable par mois)
+                </p>
+              ) : null}
             </div>
             <div>
               <label className="block text-xs font-medium text-gray-600 mb-1">

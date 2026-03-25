@@ -59,6 +59,13 @@ export default function EnfantPage() {
             planning_jeudi: e.planning_type?.jeudi || 0,
             planning_vendredi: e.planning_type?.vendredi || 0,
             planning_samedi: e.planning_type?.samedi || 0,
+            planning_alterne: e.planning_alterne || false,
+            planning_imp_lundi: e.planning_type_impaire?.lundi || 0,
+            planning_imp_mardi: e.planning_type_impaire?.mardi || 0,
+            planning_imp_mercredi: e.planning_type_impaire?.mercredi || 0,
+            planning_imp_jeudi: e.planning_type_impaire?.jeudi || 0,
+            planning_imp_vendredi: e.planning_type_impaire?.vendredi || 0,
+            planning_imp_samedi: e.planning_type_impaire?.samedi || 0,
             methode_absence: e.methode_absence,
             jours_pajemploi_contrat: e.jours_pajemploi_contrat || 0,
             cp_solde_initial: e.cp_solde_initial || 0,
@@ -108,6 +115,15 @@ export default function EnfantPage() {
         vendredi: form.planning_vendredi as number,
         samedi: form.planning_samedi as number,
       },
+      planning_alterne: form.planning_alterne as boolean,
+      planning_type_impaire: form.planning_alterne ? {
+        lundi: form.planning_imp_lundi as number,
+        mardi: form.planning_imp_mardi as number,
+        mercredi: form.planning_imp_mercredi as number,
+        jeudi: form.planning_imp_jeudi as number,
+        vendredi: form.planning_imp_vendredi as number,
+        samedi: form.planning_imp_samedi as number,
+      } : undefined,
       methode_absence: form.methode_absence as Enfant["methode_absence"],
       jours_pajemploi_contrat: form.jours_pajemploi_contrat as number,
       cp_solde_initial: form.cp_solde_initial as number,
@@ -297,6 +313,23 @@ export default function EnfantPage() {
               <option value="jours">Par jours (≤46 semaines)</option>
               <option value="minoration_cassation">Minoration Cassation</option>
             </select>
+          </section>
+
+          {/* Pajemploi & Congés */}
+          <section className="bg-white rounded-xl border p-4 space-y-3">
+            <h2 className="font-bold text-purple-900 border-b pb-2">Pajemploi & Congés payés</h2>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Nombre de jours à déclarer à Pajemploi</label>
+              <input type="number" value={form.jours_pajemploi_contrat as number || ""} onChange={(e) => update("jours_pajemploi_contrat", parseInt(e.target.value) || 0)} className="w-full border rounded-lg p-2.5 text-sm" placeholder="Ex: 20" />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Solde initial de congés payés (jours)</label>
+              <input type="number" step="0.5" value={form.cp_solde_initial as number || ""} onChange={(e) => update("cp_solde_initial", parseFloat(e.target.value) || 0)} className="w-full border rounded-lg p-2.5 text-sm" placeholder="Ex: 10" />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Date de référence du solde initial</label>
+              <input type="date" value={form.cp_solde_initial_date as string} onChange={(e) => update("cp_solde_initial_date", e.target.value)} className="w-full border rounded-lg p-2.5 text-sm" />
+            </div>
           </section>
 
           <button

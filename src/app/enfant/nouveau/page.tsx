@@ -38,6 +38,13 @@ export default function NouvelEnfantPage() {
     planning_jeudi: 0,
     planning_vendredi: 0,
     planning_samedi: 0,
+    planning_alterne: false,
+    planning_imp_lundi: 0,
+    planning_imp_mardi: 0,
+    planning_imp_mercredi: 0,
+    planning_imp_jeudi: 0,
+    planning_imp_vendredi: 0,
+    planning_imp_samedi: 0,
     methode_absence: "heures" as "heures" | "jours" | "minoration_cassation",
     jours_pajemploi_contrat: 0,
     cp_solde_initial: 0,
@@ -84,6 +91,15 @@ export default function NouvelEnfantPage() {
         vendredi: form.planning_vendredi,
         samedi: form.planning_samedi,
       },
+      planning_alterne: form.planning_alterne as boolean,
+      planning_type_impaire: form.planning_alterne ? {
+        lundi: form.planning_imp_lundi as number,
+        mardi: form.planning_imp_mardi as number,
+        mercredi: form.planning_imp_mercredi as number,
+        jeudi: form.planning_imp_jeudi as number,
+        vendredi: form.planning_imp_vendredi as number,
+        samedi: form.planning_imp_samedi as number,
+      } : undefined,
       methode_absence: form.methode_absence,
       jours_pajemploi_contrat: form.jours_pajemploi_contrat as number,
       cp_solde_initial: form.cp_solde_initial as number,
@@ -423,6 +439,57 @@ export default function NouvelEnfantPage() {
               )
             )}
           </div>
+
+          {/* Toggle paire/impaire */}
+          <div className="flex items-center gap-3 pt-2">
+            <input
+              type="checkbox"
+              id="planning_alterne"
+              checked={form.planning_alterne as boolean}
+              onChange={(e) => update("planning_alterne", e.target.checked)}
+              className="w-4 h-4"
+            />
+            <label htmlFor="planning_alterne" className="text-sm">
+              Planning alterné (semaine paire / impaire)
+            </label>
+          </div>
+
+          {/* Planning semaine impaire */}
+          {form.planning_alterne && (
+            <div>
+              <h3 className="text-xs font-bold text-purple-700 mb-2 mt-2">
+                Semaine impaire (le planning ci-dessus = semaine paire)
+              </h3>
+              <div className="grid grid-cols-3 gap-3">
+                {["lundi", "mardi", "mercredi", "jeudi", "vendredi", "samedi"].map(
+                  (jour) => (
+                    <div key={`imp_${jour}`}>
+                      <label className="block text-xs font-medium text-gray-600 mb-1 capitalize">
+                        {jour}
+                      </label>
+                      <input
+                        type="number"
+                        step="0.25"
+                        value={
+                          form[
+                            `planning_imp_${jour}` as keyof typeof form
+                          ] as number || ""
+                        }
+                        onChange={(e) =>
+                          update(
+                            `planning_imp_${jour}`,
+                            parseFloat(e.target.value) || 0
+                          )
+                        }
+                        className="w-full border rounded-lg p-2 text-sm bg-purple-50"
+                        placeholder="0"
+                      />
+                    </div>
+                  )
+                )}
+              </div>
+            </div>
+          )}
         </section>
 
         {/* Méthode absence */}
