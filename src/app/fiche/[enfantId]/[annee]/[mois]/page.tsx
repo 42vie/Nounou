@@ -133,6 +133,11 @@ export default function FichePage() {
     return <div className="p-8 text-center text-gray-400">Chargement du bulletin...</div>;
   }
 
+  // Auto-calculer IE nombre = jours effectivement travaillés
+  const joursEffectifsTravailles = Object.values(moisData.jours || {}).filter(
+    (j) => j.type === "work" || (j.commentaire === "WORK" && j.heures > 0)
+  ).length;
+
   // Calcul complet
   const taux = moisData.taux_horaire_mois || enfant.taux_horaire;
   const bulletin = calculerBulletinComplet({
@@ -162,7 +167,7 @@ export default function FichePage() {
     cotisations_config: COTISATIONS_2026,
     indemnites: {
       ie_base: moisData.ie_base || 0,
-      ie_nombre: moisData.ie_nombre || 0,
+      ie_nombre: joursEffectifsTravailles,
       ie_comp_base: moisData.ie_comp_base || 0,
       ie_comp_nombre: moisData.ie_comp_nombre || 0,
       repas_base: moisData.repas_base || 0,
@@ -298,7 +303,7 @@ export default function FichePage() {
         salaire_net_social={bulletin.net.salaire_net_social}
         indemnites={{
           ie_base: moisData.ie_base || 0,
-          ie_nombre: moisData.ie_nombre || 0,
+          ie_nombre: joursEffectifsTravailles,
           g52: bulletin.indemnites.g52,
           ie_comp_base: moisData.ie_comp_base || 0,
           ie_comp_nombre: moisData.ie_comp_nombre || 0,

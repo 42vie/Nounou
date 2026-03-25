@@ -39,6 +39,9 @@ export default function NouvelEnfantPage() {
     planning_vendredi: 0,
     planning_samedi: 0,
     methode_absence: "heures" as "heures" | "jours" | "minoration_cassation",
+    jours_pajemploi_contrat: 0,
+    cp_solde_initial: 0,
+    cp_solde_initial_date: "",
   });
 
   function update(field: string, value: string | number | boolean) {
@@ -82,6 +85,9 @@ export default function NouvelEnfantPage() {
         samedi: form.planning_samedi,
       },
       methode_absence: form.methode_absence,
+      jours_pajemploi_contrat: form.jours_pajemploi_contrat as number,
+      cp_solde_initial: form.cp_solde_initial as number,
+      cp_solde_initial_date: form.cp_solde_initial_date as string,
     };
 
     const id = await saveEnfant(user.uid, null, enfantData);
@@ -439,6 +445,49 @@ export default function NouvelEnfantPage() {
               Minoration Cour de Cassation
             </option>
           </select>
+        </section>
+
+        {/* Pajemploi + Congés */}
+        <section className="bg-white rounded-xl border p-4 space-y-3">
+          <h2 className="font-bold text-purple-900 border-b pb-2">
+            Pajemploi & Congés payés
+          </h2>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Nombre de jours à déclarer à Pajemploi
+            </label>
+            <input
+              type="number"
+              value={form.jours_pajemploi_contrat || ""}
+              onChange={(e) => update("jours_pajemploi_contrat", parseInt(e.target.value) || 0)}
+              className="w-full border rounded-lg p-2.5 text-sm"
+              placeholder="Ex: 20"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Solde initial de congés payés (jours)
+            </label>
+            <input
+              type="number"
+              step="0.5"
+              value={form.cp_solde_initial || ""}
+              onChange={(e) => update("cp_solde_initial", parseFloat(e.target.value) || 0)}
+              className="w-full border rounded-lg p-2.5 text-sm"
+              placeholder="Ex: 10"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Date de référence du solde initial
+            </label>
+            <input
+              type="date"
+              value={form.cp_solde_initial_date}
+              onChange={(e) => update("cp_solde_initial_date", e.target.value)}
+              className="w-full border rounded-lg p-2.5 text-sm"
+            />
+          </div>
         </section>
 
         <div className="flex gap-3">

@@ -115,4 +115,10 @@ body {
   body { background: white; }
   .no-print { display: none !important; }
   .bulletin { page-break-inside: avoid; }
+  /* Forcer les couleurs à l'impression */
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    color-adjust: exact !important;
+  }
 }
