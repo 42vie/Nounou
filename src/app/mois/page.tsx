@@ -129,7 +129,7 @@ export default function MoisPage() {
         <select
           value={selectedEnfant}
           onChange={(e) => setSelectedEnfant(e.target.value)}
-          className="border rounded-lg p-2.5 text-sm font-medium flex-1 min-w-0"
+          className="border rounded-lg p-2.5 text-base font-bold flex-1 min-w-0"
         >
           {enfants.map((e) => (
             <option key={e.id} value={e.id}>

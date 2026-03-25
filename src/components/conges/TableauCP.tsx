@@ -23,6 +23,7 @@ export default function TableauCP({
   enfantId,
   enfantNom,
   dateEmbauche,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   semaineProgrammees,
   anneeComplete,
   cpSoldeInitial,
@@ -59,8 +60,11 @@ export default function TableauCP({
     d.setMonth(d.getMonth() + 1);
   }
 
-  // Acquis par mois : semaines_programmées / 12 / 4 × 2.5
-  const acquisParMois = Math.round(((semaineProgrammees / 12) / 4) * 2.5 * 100) / 100;
+  // Convention collective : 2.5 jours ouvrables par mois de travail effectif
+  // Calcul cumulatif
+  function calculerAcquisCumul(nbMois: number): number {
+    return Math.min(Math.round(nbMois * 2.5 * 100) / 100, 30);
+  }
 
   // Lookup CP data
   function getCPForMois(annee: number, mois: number): CPMoisEntry | undefined {
@@ -70,14 +74,12 @@ export default function TableauCP({
   // Totaux
   let totalCpc = 0;
   let totalCpi = 0;
-  let totalAcquis = 0;
+  const totalAcquis = calculerAcquisCumul(moisListe.length);
   moisListe.forEach(({ annee, mois }) => {
     const entry = getCPForMois(annee, mois);
     totalCpc += entry?.cpc_pris || 0;
     totalCpi += entry?.cpi_pris || 0;
-    totalAcquis += acquisParMois;
   });
-  totalAcquis = Math.round(totalAcquis * 100) / 100;
   const solde = Math.round(Math.min(cpSoldeInitial + totalAcquis - totalCpc - totalCpi, 30) * 100) / 100;
 
   // Modifier un mois
@@ -95,7 +97,7 @@ export default function TableauCP({
             : c
         );
       }
-      return [...prev, { annee, mois, cpc_pris: 0, cpi_pris: 0, acquis: acquisParMois, manuel: true, [field]: value }];
+      return [...prev, { annee, mois, cpc_pris: 0, cpi_pris: 0, acquis: 2.5, manuel: true, [field]: value }];
     });
   }
 
@@ -143,7 +145,8 @@ export default function TableauCP({
             {moisListe.map(({ annee, mois }, idx) => {
               const entry = getCPForMois(annee, mois);
               const cpPris = anneeComplete ? (entry?.cpc_pris || 0) : (entry?.cpi_pris || 0);
-              const cumulAcquis = Math.round(acquisParMois * (idx + 1) * 100) / 100;
+              const cumulAcquis = calculerAcquisCumul(idx + 1);
+              const acquisMois = idx === 0 ? cumulAcquis : cumulAcquis - calculerAcquisCumul(idx);
               const cumulPris = moisListe.slice(0, idx + 1).reduce((sum, m) => {
                 const e = getCPForMois(m.annee, m.mois);
                 return sum + (anneeComplete ? (e?.cpc_pris || 0) : (e?.cpi_pris || 0));
@@ -179,7 +182,7 @@ export default function TableauCP({
                     />
                   </td>
                   <td className="px-3 py-1.5 text-center text-gray-500">
-                    {acquisParMois}
+                    {acquisMois}
                   </td>
                   <td className="px-3 py-1.5 text-center font-medium">
                     <span className={cumulSolde < 5 ? "text-red-600" : "text-purple-700"}>

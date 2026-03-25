@@ -16,10 +16,11 @@ export function calculerConges(input: CongesInput): CongesResult {
   const { mois_travailles, semaines_travaillees, jours_enfant, jours_pris } =
     input;
 
-  // ARRONDI.SUP(E74/4 × 2.5 + E73 × 2.5, 0) + G73
-  const calcul =
-    Math.ceil((semaines_travaillees / 4) * 2.5 + mois_travailles * 2.5) +
-    jours_enfant;
+  // Convention collective : 2.5 jours ouvrables par mois de travail effectif
+  // OU par période de 4 semaines. On prend le plus avantageux.
+  const parSemaines = Math.ceil(semaines_travaillees / 4) * 2.5;
+  const parMois = mois_travailles * 2.5;
+  const calcul = Math.round(Math.max(parSemaines, parMois) * 100) / 100 + jours_enfant;
 
   // Plafonné à 30 jours ouvrables
   const jours_acquis = Math.min(calcul, 30);
