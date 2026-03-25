@@ -159,7 +159,37 @@ export default function FichePage() {
     heures_sup_semaine: enfant.heures_sup_semaine,
     mois_prevus: enfant.mois_prevus,
   });
-  const salaireMensualise = mens.heures_mensualisees * taux;
+
+  // Prorata du 1er mois si embauche en cours de mois
+  const embaucheDate = enfant.date_embauche?.toDate?.() ? enfant.date_embauche.toDate() : null;
+  const isPremierMois = embaucheDate &&
+    embaucheDate.getFullYear() === annee &&
+    embaucheDate.getMonth() === moisIdx &&
+    embaucheDate.getDate() > 1;
+
+  let heuresMensuProrata = mens.heures_mensualisees;
+  if (isPremierMois && embaucheDate) {
+    // Prorata basé sur les HEURES du planning type
+    // Heures prévues dans le mois entier vs heures à partir de l'embauche
+    const nbJM = getDaysInMonth(annee, moisIdx);
+    const joursSemaine = ["dimanche", "lundi", "mardi", "mercredi", "jeudi", "vendredi", "samedi"];
+    let heuresTotalMois = 0;
+    let heuresEffectives = 0;
+    for (let d = 1; d <= nbJM; d++) {
+      const date = new Date(annee, moisIdx, d);
+      const dow = date.getDay();
+      if (dow === 0 || dow === 6) continue;
+      const jourKey = joursSemaine[dow];
+      const h = (enfant.planning_type as Record<string, number>)?.[jourKey] || 0;
+      heuresTotalMois += h;
+      if (d >= embaucheDate.getDate()) heuresEffectives += h;
+    }
+    if (heuresTotalMois > 0) {
+      heuresMensuProrata = Math.round(mens.heures_mensualisees * heuresEffectives / heuresTotalMois * 100) / 100;
+    }
+  }
+
+  const salaireMensualise = heuresMensuProrata * taux;
   const absences = calculerAbsencesMois(
     {
       annee_complete: enfant.annee_complete,
