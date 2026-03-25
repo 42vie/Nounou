@@ -371,6 +371,9 @@ export default function FichePage() {
         absence_salarie_heures={absences.heures_abs_salarie}
         taux_deduction_enfant={taux}
         taux_deduction_salarie={taux}
+        absence_methode={absences.methode}
+        absence_salaire_mensualise={salaireMensualise}
+        absence_unites_potentiel={absences.unites_potentiel}
         prime_precarite_base={moisData.prime_precarite_base || 0}
         jours={Object.fromEntries(
           Object.entries(moisData.jours || {}).map(([k, v]) => [k, {

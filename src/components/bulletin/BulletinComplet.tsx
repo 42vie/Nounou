@@ -38,6 +38,10 @@ interface BulletinCompletProps {
   absence_salarie_heures: number;
   taux_deduction_enfant: number;
   taux_deduction_salarie: number;
+  // Méthode absence pour affichage
+  absence_methode?: "heures" | "jours";
+  absence_salaire_mensualise?: number;
+  absence_unites_potentiel?: number;
   prime_precarite_base: number;
   jours: Record<string, { heures: number; heures_comp: number; heures_sup: number; heures_contrac: number; commentaire: string }>;
   nbJoursMois: number;
@@ -109,8 +113,28 @@ export function BulletinComplet(p: BulletinCompletProps) {
     { lbl2: fmtPct(p.majoration_sup_mens), lbl: "Majoration H.sup mensualisées", h: p.heures_sup_mensualisees, t: p.taux_horaire * p.majoration_sup_mens, m: p.remuneration.j17, hFmt: "hrs" },
     { lbl2: "majoration:", lbl: "Heures complémentaires", h: p.heures_comp_base || undefined, t: p.taux_horaire * (1 + p.majoration_comp), m: p.remuneration.j18 },
     { lbl2: "majoration:", lbl: "Heures supplémentaires", h: p.heures_sup_base || undefined, t: p.taux_horaire * (1 + p.majoration_sup), m: p.remuneration.j19 },
-    { lbl: "Absence de l'enfant", h: p.absence_enfant_heures || undefined, t: p.absence_enfant_heures > 0 ? p.taux_deduction_enfant : undefined, m: p.remuneration.j20, isNeg: true },
-    { lbl: "Absence du salarié", h: p.absence_salarie_heures || undefined, t: p.absence_salarie_heures > 0 ? p.taux_deduction_salarie : undefined, m: p.remuneration.j21, isNeg: true },
+    { lbl: "Absence de l'enfant",
+      h: p.absence_enfant_heures || undefined,
+      t: undefined, // ANJE ne déduit pas
+      m: p.remuneration.j20, isNeg: true,
+      hFmt: p.absence_methode === "jours" ? "jrs" : "hrs",
+    },
+    { lbl: "Absence du salarié",
+      h: p.absence_methode && p.absence_salaire_mensualise
+        ? p.absence_salaire_mensualise  // Base = salaire mensualisé (méthode proportionnelle)
+        : p.absence_salarie_heures || undefined,
+      t: p.absence_methode && p.absence_unites_potentiel
+        ? undefined  // Pas de taux simple, c'est proportionnel
+        : p.absence_salarie_heures > 0 ? p.taux_deduction_salarie : undefined,
+      m: p.remuneration.j21, isNeg: true,
+      hFmt: p.absence_methode
+        ? (p.absence_methode === "jours" ? "jrs" : "hrs")
+        : "hrs",
+      // Afficher la fraction pour la méthode proportionnelle
+      t2: p.absence_methode && p.absence_salarie_heures > 0 && p.absence_unites_potentiel
+        ? `${p.absence_salarie_heures}/${p.absence_unites_potentiel}`
+        : undefined,
+    },
     { lbl: "Indemnité de congés payés pendant le contrat", m: p.remuneration.j22 },
     { lbl: "Régularisation", m: p.remuneration.j23 },
     { lbl: "Indemnité compensatrice de congés payés - ICCP", m: p.remuneration.j24 },
