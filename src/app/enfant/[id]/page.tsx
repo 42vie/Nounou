@@ -18,6 +18,7 @@ export default function EnfantPage() {
   const [enfant, setEnfant] = useState<Enfant | null>(null);
   const [saving, setSaving] = useState(false);
   const [editing, setEditing] = useState(false);
+  const [savedMsg, setSavedMsg] = useState(false);
 
   const [form, setForm] = useState<Record<string, string | number | boolean>>({});
 
@@ -130,6 +131,8 @@ export default function EnfantPage() {
     setEnfant({ ...data, id });
     setEditing(false);
     setSaving(false);
+    setSavedMsg(true);
+    setTimeout(() => setSavedMsg(false), 3000);
   }
 
   async function handleDelete() {
@@ -146,6 +149,15 @@ export default function EnfantPage() {
 
   return (
     <div className="max-w-2xl mx-auto space-y-6">
+      {/* Message de confirmation */}
+      {savedMsg && (
+        <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-xl text-sm font-medium flex items-center gap-2 animate-[fadeIn_0.3s_ease-out]">
+          <svg className="w-5 h-5 text-green-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+          </svg>
+          Contrat enregistré avec succès
+        </div>
+      )}
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-bold text-gray-900">{enfant.nom}</h1>
         <div className="flex gap-2">
