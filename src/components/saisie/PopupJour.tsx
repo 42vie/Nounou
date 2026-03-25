@@ -466,10 +466,12 @@ export default function PopupJour({
                     onChange={(e) => {
                       const val = parseFloat(e.target.value) || 0;
                       setHeures(val);
-                      // Auto-calc H. complémentaires si heures > planning
+                      // Auto-calc H. supplémentaires si heures > planning
                       if (selectedCode === "WORK" && val > planningHours && planningHours > 0) {
-                        setHeuresComp(Math.round((val - planningHours) * 100) / 100);
+                        setHeuresSup(Math.round((val - planningHours) * 100) / 100);
+                        setHeuresComp(0);
                       } else if (selectedCode === "WORK") {
+                        setHeuresSup(0);
                         setHeuresComp(0);
                       }
                     }}
