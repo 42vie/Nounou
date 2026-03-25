@@ -21,6 +21,10 @@ export interface RemunerationInput {
   taux_deduction_absence_enfant: number; // I20
   taux_deduction_absence_salarie: number; // I21
 
+  // OU montant de déduction pré-calculé (prioritaire si > 0)
+  montant_deduction_enfant?: number; // Montant pré-calculé par calculerAbsencesMois
+  montant_deduction_salarie?: number; // Montant pré-calculé par calculerAbsencesMois
+
   // Autres
   indemnite_cp: number; // J22
   regularisation: number; // J23
@@ -97,14 +101,21 @@ export function calculerRemuneration(
   const j19 = Math.round(heures_sup_base * i19 * 100) / 100;
 
   // Ligne 20: Absence enfant (négatif)
-  const j20 =
-    absence_enfant_heures > 0
+  // Si montant pré-calculé fourni (méthode proportionnelle), l'utiliser
+  // Sinon fallback sur heures × taux
+  const j20 = input.montant_deduction_enfant
+    ? -Math.round(input.montant_deduction_enfant * 100) / 100
+    : absence_enfant_heures > 0
       ? -Math.round(absence_enfant_heures * taux_deduction_absence_enfant * 100) / 100
       : 0;
 
   // Ligne 21: Absence salarié (négatif)
-  const j21 =
-    absence_salarie_heures > 0
+  // Utilise la méthode proportionnelle : mens × abs / potentiel
+  // ≤46 sem : mens × jours_abs / jours_potentiel
+  // 52 sem  : mens × heures_abs / heures_potentiel
+  const j21 = input.montant_deduction_salarie
+    ? -Math.round(input.montant_deduction_salarie * 100) / 100
+    : absence_salarie_heures > 0
       ? -Math.round(absence_salarie_heures * taux_deduction_absence_salarie * 100) / 100
       : 0;
 
