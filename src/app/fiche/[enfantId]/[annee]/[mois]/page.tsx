@@ -60,7 +60,9 @@ export default function FichePage() {
     let cumulNet = 0;
     let cumulIe = 0;
     for (const md of allMois) {
-      if (md.mois <= moisIdx) {
+      // Ne cumuler que les mois avec des jours réellement saisis
+      const hasJours = md.jours && Object.keys(md.jours).length > 0;
+      if (md.mois <= moisIdx && hasJours) {
         try {
           const enf = e!;
           const bulletin = calculerBulletinComplet({
