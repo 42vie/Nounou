@@ -91,7 +91,10 @@ export interface ResultatAbsence {
  * Codes qui génèrent une déduction :
  * - ABS (absence salarié) → ligne 21
  * - CSS (congé sans solde) → ligne 21 (même traitement, le salarié ne travaille pas)
- * - ANJE (absence enfant) → ligne 20
+ *
+ * Codes qui NE génèrent PAS de déduction :
+ * - ANJE (absence enfant) → pas de déduction (mensualisé, le parent paie)
+ *   Col. O remplie uniquement pour la régularisation annuelle
  *
  * Pour CSS : pas de col. O visible dans le popup, mais on utilise
  * le planning type pour calculer les heures de déduction en arrière-plan.
@@ -109,8 +112,7 @@ export function calculerAbsencesMois(
 ): ResultatAbsence {
   const potentiel = calculerPotentielMois(annee, mois, contrat.planning_type);
 
-  let joursAbsEnfant = 0;
-  let heuresAbsEnfant = 0;
+  let heuresAbsEnfant = 0; // Pour info uniquement — ANJE ne déduit pas
   let joursAbsSalarie = 0;
   let heuresAbsSalarie = 0;
   let joursReellementTravailles = 0;
@@ -120,11 +122,12 @@ export function calculerAbsencesMois(
     const code = data.commentaire || data.type; // Le code est stocké dans commentaire
 
     if (code === "ANJE") {
-      joursAbsEnfant++;
-      // Heures = col. O si remplie, sinon planning type
+      // ANJE = absence enfant → PAS de déduction (mensualisé, le parent paie)
+      // On stocke juste les heures pour info (col. O) mais ça ne déduit rien
       heuresAbsEnfant += data.heures_contrac > 0
         ? data.heures_contrac
         : getHeuresPlanningType(jour, annee, mois, contrat.planning_type);
+      // NB: joursAbsEnfant++ volontairement absent — ANJE ne compte pas dans la déduction
     } else if (code === "ABS") {
       joursAbsSalarie++;
       heuresAbsSalarie += data.heures_contrac > 0
@@ -141,8 +144,9 @@ export function calculerAbsencesMois(
     }
   }
 
-  const totalJoursAbsents = joursAbsEnfant + joursAbsSalarie;
-  const totalHeuresAbsentes = heuresAbsEnfant + heuresAbsSalarie;
+  // Seuls ABS + CSS génèrent une déduction. ANJE = pas de déduction.
+  const totalJoursAbsents = joursAbsSalarie; // PAS joursAbsEnfant
+  const totalHeuresAbsentes = heuresAbsSalarie; // PAS heuresAbsEnfant
 
   let deduction: number;
   let methode: "jours" | "heures";

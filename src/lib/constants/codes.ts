@@ -53,9 +53,9 @@ export const CODES: CodeJour[] = [
   {
     code: "ANJE",
     label: "ANJE",
-    tooltip: "Absence non justifiée de l'enfant. Déduction sur le salaire (ligne 20). Col. O = heures contractuelles pour le calcul.",
+    tooltip: "Absence non justifiée de l'enfant. PAS de déduction (mensualisé, le parent paie). Col. O remplie pour la régularisation annuelle.",
     couleur: "orange",
-    categorie: "absence",
+    categorie: "autre",
     affecteColL: false,
     affecteColO: true,
     autoRemplirColO: true,
