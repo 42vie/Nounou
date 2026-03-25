@@ -14,10 +14,12 @@ interface RecapMoisProps {
 export default function RecapMois({ enfantNom, annee, mois, joursData }: RecapMoisProps) {
   const recap = useMemo(() => {
     const nbJoursMois = getDaysInMonth(annee, mois);
+
+    // Count working days (lundi-samedi = ouvrable)
     let joursOuvres = 0;
     for (let j = 1; j <= nbJoursMois; j++) {
       const dow = new Date(annee, mois, j).getDay();
-      if (dow !== 0) joursOuvres++; // lundi-samedi = ouvrable
+      if (dow !== 0) joursOuvres++;
     }
 
     let joursSaisis = 0;
@@ -31,6 +33,8 @@ export default function RecapMois({ enfantNom, annee, mois, joursData }: RecapMo
     let countCP = 0;
     let countRepas = 0;
     let joursTravailles = 0;
+    let countFeries = 0;
+    let countAbsences = 0;
 
     for (const [, data] of Object.entries(joursData)) {
       joursSaisis++;
@@ -41,7 +45,7 @@ export default function RecapMois({ enfantNom, annee, mois, joursData }: RecapMo
 
       if (data.repas) countRepas++;
 
-      // Code from commentaire
+      // Code stored in commentaire field
       const code = data.commentaire || "";
 
       if (code === "WORK") {
@@ -56,6 +60,8 @@ export default function RecapMois({ enfantNom, annee, mois, joursData }: RecapMo
 
       if (code === "CSS") countCSS++;
       if (code === "CPC" || code === "CPI") countCP++;
+      if (code === "FERIE" || code === "FCP") countFeries++;
+      if (code === "ANJE" || code === "ABS") countAbsences++;
     }
 
     return {
@@ -71,10 +77,16 @@ export default function RecapMois({ enfantNom, annee, mois, joursData }: RecapMo
       countCP,
       countRepas,
       joursTravailles,
+      countFeries,
+      countAbsences,
     };
   }, [joursData, annee, mois]);
 
   const moisNom = MOIS_NOMS[mois];
+
+  const progressPct = recap.joursOuvres > 0
+    ? Math.min(100, Math.round((recap.joursSaisis / recap.joursOuvres) * 100))
+    : 0;
 
   return (
     <div className="bg-purple-50/60 border border-purple-200 rounded-2xl p-4 space-y-3">
@@ -86,6 +98,14 @@ export default function RecapMois({ enfantNom, annee, mois, joursData }: RecapMo
         <span className="text-xs text-purple-600 font-medium">
           {recap.joursSaisis} jrs saisis / {recap.joursOuvres} ouvrés
         </span>
+      </div>
+
+      {/* Progress bar */}
+      <div className="h-1.5 bg-purple-100 rounded-full overflow-hidden">
+        <div
+          className="h-full bg-purple-500 rounded-full transition-all duration-500 ease-out"
+          style={{ width: `${progressPct}%` }}
+        />
       </div>
 
       {/* Stats */}
@@ -100,28 +120,49 @@ export default function RecapMois({ enfantNom, annee, mois, joursData }: RecapMo
 
       {/* Detail row */}
       <div className="flex flex-wrap gap-x-3 gap-y-1 text-xs text-purple-700">
-        <span>{recap.joursGte8h} jrs ≥8h</span>
-        <span className="text-purple-300">·</span>
+        <span>{recap.joursGte8h} jrs &ge;8h</span>
+        <span className="text-purple-300">&middot;</span>
         <span>{recap.heuresSub8h.toFixed(1)}h &lt;8h</span>
-        <span className="text-purple-300">·</span>
+        <span className="text-purple-300">&middot;</span>
         <span>{recap.countCSS} CSS</span>
-        <span className="text-purple-300">·</span>
+        <span className="text-purple-300">&middot;</span>
         <span>{recap.countCP} CP</span>
-        <span className="text-purple-300">·</span>
+        <span className="text-purple-300">&middot;</span>
         <span>{recap.countRepas} repas</span>
       </div>
 
-      {/* Complementary / Supplementary */}
-      {(recap.totalHeuresComp > 0 || recap.totalHeuresSup > 0) && (
-        <div className="flex flex-wrap gap-x-3 gap-y-1 text-xs text-purple-600">
+      {/* Complementary / Supplementary / Contractual */}
+      {(recap.totalHeuresComp > 0 || recap.totalHeuresSup > 0 || recap.totalHeuresContrac > 0) && (
+        <div className="flex flex-wrap gap-x-3 gap-y-1 text-xs text-purple-600 pt-1 border-t border-purple-100">
           {recap.totalHeuresComp > 0 && (
-            <span>+{recap.totalHeuresComp.toFixed(2)}h comp.</span>
+            <span>+{recap.totalHeuresComp.toFixed(2)}h comp. (M)</span>
           )}
           {recap.totalHeuresSup > 0 && (
-            <span>+{recap.totalHeuresSup.toFixed(2)}h sup.</span>
+            <span>+{recap.totalHeuresSup.toFixed(2)}h sup. (N)</span>
           )}
           {recap.totalHeuresContrac > 0 && (
-            <span>{recap.totalHeuresContrac.toFixed(2)}h contrac. (col. O)</span>
+            <span>{recap.totalHeuresContrac.toFixed(2)}h contrac. (O)</span>
+          )}
+        </div>
+      )}
+
+      {/* Counts by category */}
+      {(recap.countFeries > 0 || recap.countAbsences > 0) && (
+        <div className="flex flex-wrap gap-x-3 gap-y-1 text-xs text-purple-600">
+          {recap.joursTravailles > 0 && (
+            <span>{recap.joursTravailles} jrs trav.</span>
+          )}
+          {recap.countFeries > 0 && (
+            <>
+              <span className="text-purple-300">&middot;</span>
+              <span>{recap.countFeries} fériés</span>
+            </>
+          )}
+          {recap.countAbsences > 0 && (
+            <>
+              <span className="text-purple-300">&middot;</span>
+              <span>{recap.countAbsences} abs.</span>
+            </>
           )}
         </div>
       )}
