@@ -354,7 +354,7 @@ export default function FichePage() {
         }}
         jours_8h_plus={bulletin.pajemploi.jours_8h_plus}
         cumul_heures_moins_8h={bulletin.pajemploi.cumul_heures_moins_8h}
-        jours_pajemploi={moisData.jours_pajemploi || 0}
+        jours_pajemploi={moisData.jours_pajemploi || enfant.jours_pajemploi_contrat || 0}
         net_imposable={bulletin.net.net_imposable}
         taux_pas={moisData.taux_pas || 0}
         montant_pas={bulletin.net.montant_pas}
