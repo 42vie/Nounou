@@ -431,6 +431,24 @@ export default function ParametresPage() {
         </div>
       </div>
 
+      {/* Test notification */}
+      <button
+        onClick={() => {
+          if (typeof Notification !== "undefined" && Notification.permission === "granted") {
+            new Notification("AssMatPaie — Test", {
+              body: "Les notifications fonctionnent !",
+              icon: "/logo-assmatpaie.png",
+            });
+            showToast("Notification envoyée !");
+          } else {
+            showToast("Notifications non autorisées", "error");
+          }
+        }}
+        className="w-full py-3 bg-purple-50 text-purple-600 border border-purple-200 rounded-xl font-medium text-sm hover:bg-purple-100 transition-colors"
+      >
+        Tester les notifications
+      </button>
+
       {/* Sign out */}
       <button
         onClick={handleSignOut}
