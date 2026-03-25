@@ -326,9 +326,19 @@ export default function PopupJour({
         `}
         onClick={(e) => e.stopPropagation()}
       >
-        {/* ===== Drag handle (mobile) ===== */}
-        <div className="flex justify-center pt-3 pb-1 md:hidden">
-          <div className="w-10 h-1 bg-gray-300 rounded-full" />
+        {/* ===== Header avec bouton fermer ===== */}
+        <div className="flex items-center justify-between pt-3 px-4 pb-1">
+          <div className="w-10 h-1 bg-gray-300 rounded-full md:hidden" />
+          <div className="flex-1" />
+          <button
+            onClick={handleClose}
+            className="w-9 h-9 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 active:bg-gray-300 transition-colors"
+            aria-label="Fermer"
+          >
+            <svg className="w-5 h-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
         </div>
 
         {/* ===== Enfant tabs ===== */}
