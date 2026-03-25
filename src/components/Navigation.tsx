@@ -8,7 +8,7 @@ import { Home, CalendarDays, BarChart3, Settings } from "lucide-react";
 
 const navItems = [
   { href: "/", label: "Accueil", icon: Home },
-  { href: "/mois", label: "Saisie", icon: CalendarDays },
+  { href: "/mois", label: "Planning", icon: CalendarDays },
   { href: "/recapitulatif", label: "Récap", icon: BarChart3 },
   { href: "/parametres", label: "Paramètres", icon: Settings },
 ];
