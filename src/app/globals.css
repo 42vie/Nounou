@@ -1,0 +1,118 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #f8f9fa;
+  --foreground: #171717;
+  --violet-light: #CC99FF;
+  --violet: #E9ABEB;
+  --lavande: #E7E2F8;
+  --violet-fonce: #CFC6F2;
+  --rose-saisie: #FFE4E1;
+  --vert-ok: #d4edda;
+}
+
+body {
+  color: var(--foreground);
+  background: var(--background);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+/* Bulletin de paie — styles fidèles Pro ASSMAT */
+.bulletin {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 9px;
+  line-height: 1.3;
+  color: #000;
+  background: #fff;
+}
+
+.bulletin table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+.bulletin td, .bulletin th {
+  border: 0.5px solid #999;
+  padding: 1px 3px;
+  vertical-align: middle;
+}
+
+.bulletin .cell-saisie {
+  background-color: var(--rose-saisie);
+}
+
+.bulletin .cell-calcul {
+  background-color: var(--violet);
+}
+
+.bulletin .cell-violet-light {
+  background-color: var(--violet-light);
+}
+
+.bulletin .cell-lavande {
+  background-color: var(--lavande);
+}
+
+.bulletin .cell-violet-fonce {
+  background-color: var(--violet-fonce);
+}
+
+.bulletin .cell-negatif {
+  color: red;
+}
+
+.bulletin .cell-brut {
+  background-color: var(--violet);
+  font-weight: bold;
+}
+
+.bulletin .cell-net {
+  background-color: var(--violet);
+  font-weight: bold;
+  font-size: 11px;
+}
+
+/* Journal de saisie quotidienne */
+.jour-cell {
+  min-height: 44px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.jour-cell:hover {
+  background-color: #f0f0ff;
+}
+
+.jour-cell.weekend {
+  background-color: #f5f5f5;
+}
+
+.jour-cell.ferie {
+  background-color: #fff3cd;
+}
+
+.jour-cell.saisi {
+  background-color: var(--vert-ok);
+}
+
+.jour-cell.absence {
+  background-color: #f8d7da;
+}
+
+/* Mobile-first responsive */
+@media (max-width: 768px) {
+  .bulletin {
+    font-size: 7px;
+  }
+  .bulletin td, .bulletin th {
+    padding: 0.5px 1px;
+  }
+}
+
+@media print {
+  body { background: white; }
+  .no-print { display: none !important; }
+  .bulletin { page-break-inside: avoid; }
+}
