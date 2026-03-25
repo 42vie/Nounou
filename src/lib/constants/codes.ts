@@ -53,9 +53,9 @@ export const CODES: CodeJour[] = [
   {
     code: "ANJE",
     label: "ANJE",
-    tooltip: "Absence non justifiée de l'enfant. Déduction sur le salaire. Mettre les heures contractuelles en col. O.",
-    couleur: "red",
-    categorie: "absence",
+    tooltip: "Absence non justifiée de l'enfant. Pas de déduction (salaire mensualisé, le parent paie quand même). Col. O pour régularisation.",
+    couleur: "orange",
+    categorie: "autre",
     affecteColL: false,
     affecteColO: true,
     autoRemplirColO: true,
@@ -77,14 +77,14 @@ export const CODES: CodeJour[] = [
   {
     code: "CSS",
     label: "CSS",
-    tooltip: "Congé sans solde. Pas de rémunération ce jour. Pas d'heures contractuelles.",
+    tooltip: "Congé sans solde. Déduction sur le salaire mensualisé (ligne 21 Absence salarié). Heures contractuelles en col. O.",
     couleur: "amber",
-    categorie: "conge",
+    categorie: "absence",
     affecteColL: false,
-    affecteColO: false,
-    autoRemplirColO: false,
+    affecteColO: true,
+    autoRemplirColO: true,
     affecteColMN: false,
-    compteRegularisation: false,
+    compteRegularisation: true,
   },
   {
     code: "CPC",
@@ -172,4 +172,5 @@ export const CODE_COLORS: Record<string, { bg: string; border: string; text: str
   amber: { bg: "bg-amber-50", border: "border-amber-300", text: "text-amber-800", bgActive: "bg-amber-100" },
   violet: { bg: "bg-violet-50", border: "border-violet-300", text: "text-violet-800", bgActive: "bg-violet-100" },
   teal: { bg: "bg-teal-50", border: "border-teal-300", text: "text-teal-800", bgActive: "bg-teal-100" },
+  orange: { bg: "bg-orange-50", border: "border-orange-300", text: "text-orange-800", bgActive: "bg-orange-100" },
 };
