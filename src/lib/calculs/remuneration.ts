@@ -101,19 +101,16 @@ export function calculerRemuneration(
   const j19 = Math.round(heures_sup_base * i19 * 100) / 100;
 
   // Ligne 20: Absence enfant (négatif)
-  // Si montant pré-calculé fourni (méthode proportionnelle), l'utiliser
-  // Sinon fallback sur heures × taux
-  const j20 = input.montant_deduction_enfant
+  // ANJE ne déduit PAS — montant_deduction_enfant = 0 explicitement
+  const j20 = input.montant_deduction_enfant !== undefined
     ? -Math.round(input.montant_deduction_enfant * 100) / 100
     : absence_enfant_heures > 0
       ? -Math.round(absence_enfant_heures * taux_deduction_absence_enfant * 100) / 100
       : 0;
 
   // Ligne 21: Absence salarié (négatif)
-  // Utilise la méthode proportionnelle : mens × abs / potentiel
-  // ≤46 sem : mens × jours_abs / jours_potentiel
-  // 52 sem  : mens × heures_abs / heures_potentiel
-  const j21 = input.montant_deduction_salarie
+  // Méthode proportionnelle : mens × abs / potentiel
+  const j21 = input.montant_deduction_salarie !== undefined
     ? -Math.round(input.montant_deduction_salarie * 100) / 100
     : absence_salarie_heures > 0
       ? -Math.round(absence_salarie_heures * taux_deduction_absence_salarie * 100) / 100

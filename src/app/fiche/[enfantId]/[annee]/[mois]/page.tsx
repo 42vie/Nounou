@@ -242,10 +242,11 @@ export default function FichePage() {
     absence_salarie_heures: absences.heures_abs_salarie,
     taux_deduction_absence_enfant: taux,
     taux_deduction_absence_salarie: taux,
-    // Montant de déduction pré-calculé avec la bonne méthode (proportionnelle)
-    // ≤46 sem : mens × jours_abs / jours_potentiel
-    // 52 sem  : mens × heures_abs / heures_potentiel
-    montant_deduction_salarie: absences.deduction,
+    // Méthode "heures" = simple (heures × taux horaire)
+    // Méthode "jours" ou "minoration_cassation" = proportionnelle (mens × abs / potentiel)
+    montant_deduction_salarie: enfant.methode_absence === "heures"
+      ? undefined  // undefined = fallback sur heures × taux (simple)
+      : absences.deduction,  // proportionnelle
     montant_deduction_enfant: 0, // ANJE ne déduit pas
     indemnite_cp: moisData.indemnite_cp || 0,
     regularisation: moisData.regularisation || 0,
@@ -370,7 +371,10 @@ export default function FichePage() {
         absence_enfant_heures={absences.heures_abs_enfant}
         absence_salarie_heures={absences.heures_abs_salarie}
         taux_deduction_enfant={taux}
-        taux_deduction_salarie={absences.unites_potentiel > 0 ? Math.round(salaireMensualise / absences.unites_potentiel * 100) / 100 : taux}
+        taux_deduction_salarie={taux}
+        absence_methode={absences.methode}
+        absence_salaire_mensualise={salaireMensualise}
+        absence_unites_potentiel={absences.unites_potentiel}
         prime_precarite_base={moisData.prime_precarite_base || 0}
         jours={Object.fromEntries(
           Object.entries(moisData.jours || {}).map(([k, v]) => [k, {
