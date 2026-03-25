@@ -2,7 +2,7 @@
 
 import { useState, useCallback, useEffect, useMemo, useRef } from "react";
 import type { JourData, JourType } from "@/lib/firestore";
-import { CODES, CODE_COLORS, type CodeJour, getCode } from "@/lib/constants/codes";
+import { CODE_COLORS, type CodeJour, getCode } from "@/lib/constants/codes";
 import { MOIS_NOMS, JOURS_SEMAINE, getDaysInMonth } from "@/lib/utils";
 import { getJoursFeriesMap } from "@/lib/constants/feries";
 import GrilleCode from "./GrilleCode";

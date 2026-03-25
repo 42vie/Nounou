@@ -43,7 +43,7 @@ export default function GrilleCode({ selectedCode, onSelect }: GrilleCodeProps) 
                 }}
                 onMouseEnter={() => handleMouseEnter(code.code)}
                 onMouseLeave={handleMouseLeave}
-                onTouchStart={(e) => {
+                onTouchStart={() => {
                   // On long press show tooltip, on quick tap just select
                   handleTouchStart(code.code);
                 }}

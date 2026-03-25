@@ -1,17 +1,15 @@
 "use client";
 
-import { useState } from "react";
 import { JourData, JourType } from "@/lib/firestore";
 import { getJoursFeriesMap } from "@/lib/constants/feries";
 import { getDaysInMonth, getDayOfWeek } from "@/lib/utils";
-import { SaisieJour } from "./SaisieJour";
 
 interface CalendrierMoisProps {
   annee: number;
   mois: number;
   jours: Record<string, JourData>;
-  planningType: Record<string, number>;
-  onSaveJour: (jour: string, data: JourData) => void;
+  planningType?: Record<string, number>;
+  onSelectJour: (jour: number) => void;
   onApplyPlanning: () => void;
 }
 
@@ -28,11 +26,9 @@ export function CalendrierMois({
   annee,
   mois,
   jours,
-  planningType,
-  onSaveJour,
+  onSelectJour,
   onApplyPlanning,
 }: CalendrierMoisProps) {
-  const [selectedJour, setSelectedJour] = useState<number | null>(null);
   const nbJours = getDaysInMonth(annee, mois);
   const feriesMap = getJoursFeriesMap(annee);
   const today = new Date();
@@ -123,15 +119,15 @@ export function CalendrierMois({
             return (
               <div
                 key={jour}
-                onClick={() => setSelectedJour(jour)}
+                onClick={() => onSelectJour(jour)}
                 className={cellClass}
               >
                 <div className={`text-xs font-bold ${isToday ? "text-purple-700" : "text-gray-700"}`}>
                   {jour}
                 </div>
-                {isSaisi && jourData.heures > 0 && (
+                {isSaisi && (
                   <div className="text-[10px] text-gray-600 font-medium">
-                    {jourData.heures}h
+                    {jourData.heures > 0 ? `${jourData.heures}h` : jourData.commentaire || ""}
                   </div>
                 )}
                 {ferie && !isSaisi && (
@@ -155,18 +151,6 @@ export function CalendrierMois({
         ))}
       </div>
 
-      {/* Modal saisie jour */}
-      {selectedJour !== null && (
-        <SaisieJour
-          annee={annee}
-          mois={mois}
-          jour={selectedJour}
-          jourData={jours[String(selectedJour)] || null}
-          planningType={planningType}
-          onSave={onSaveJour}
-          onClose={() => setSelectedJour(null)}
-        />
-      )}
     </div>
   );
 }
