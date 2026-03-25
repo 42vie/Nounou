@@ -1,0 +1,27 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Users can only read/write their own data
+    match /users/{uid} {
+      allow read, write: if request.auth != null && request.auth.uid == uid;
+
+      match /enfants/{enfantId} {
+        allow read, write: if request.auth != null && request.auth.uid == uid;
+
+        match /cp/{document=**} {
+          allow read, write: if request.auth != null && request.auth.uid == uid;
+        }
+      }
+
+      match /mois/{document=**} {
+        allow read, write: if request.auth != null && request.auth.uid == uid;
+      }
+
+      match /parametres/{document=**} {
+        allow read, write: if request.auth != null && request.auth.uid == uid;
+      }
+    }
+  }
+}
