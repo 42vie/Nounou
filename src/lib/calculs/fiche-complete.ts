@@ -24,6 +24,8 @@ export interface BulletinInput {
   absence_salarie_heures: number;
   taux_deduction_absence_enfant: number;
   taux_deduction_absence_salarie: number;
+  montant_deduction_enfant?: number;
+  montant_deduction_salarie?: number;
   indemnite_cp: number;
   regularisation: number;
   iccp: number;
@@ -65,6 +67,8 @@ export function calculerBulletinComplet(input: BulletinInput) {
     absence_salarie_heures: input.absence_salarie_heures,
     taux_deduction_absence_enfant: input.taux_deduction_absence_enfant,
     taux_deduction_absence_salarie: input.taux_deduction_absence_salarie,
+    montant_deduction_enfant: input.montant_deduction_enfant,
+    montant_deduction_salarie: input.montant_deduction_salarie,
     indemnite_cp: input.indemnite_cp,
     regularisation: input.regularisation,
     iccp: input.iccp,
