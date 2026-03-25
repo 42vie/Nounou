@@ -99,7 +99,7 @@ export default function NouvelEnfantPage() {
         jeudi: form.planning_imp_jeudi as number,
         vendredi: form.planning_imp_vendredi as number,
         samedi: form.planning_imp_samedi as number,
-      } : undefined,
+      } : null,
       methode_absence: form.methode_absence,
       jours_pajemploi_contrat: form.jours_pajemploi_contrat as number,
       cp_solde_initial: form.cp_solde_initial as number,
