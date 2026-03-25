@@ -6,13 +6,23 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/lib/auth-context";
-import { getEnfants, getUserData, Enfant, UserData } from "@/lib/firestore";
+import {
+  getEnfants,
+  getUserData,
+  getMoisData,
+  saveJourData,
+  defaultMoisData,
+  Enfant,
+  UserData,
+  MoisData,
+} from "@/lib/firestore";
 import {
   requestNotificationPermission,
   isDailyEnabled,
   scheduleDaily,
   getNotificationPermission,
 } from "@/lib/notifications";
+import PopupJour from "@/components/saisie/PopupJour";
 
 export default function DashboardPage() {
   const { user, loading } = useAuth();
@@ -20,6 +30,9 @@ export default function DashboardPage() {
   const [enfants, setEnfants] = useState<Enfant[]>([]);
   const [userData, setUserData] = useState<UserData | null>(null);
   const [notifEnabled, setNotifEnabled] = useState(false);
+  const [showPopup, setShowPopup] = useState(false);
+  const [moisData, setMoisData] = useState<MoisData | null>(null);
+  const [selectedEnfant, setSelectedEnfant] = useState<string>("");
 
   useEffect(() => {
     if (!loading && !user) {
@@ -29,11 +42,29 @@ export default function DashboardPage() {
 
   useEffect(() => {
     if (user) {
-      getEnfants(user.uid).then(setEnfants);
+      getEnfants(user.uid).then((e) => {
+        setEnfants(e);
+        if (e.length > 0 && !selectedEnfant) setSelectedEnfant(e[0].id!);
+      });
       getUserData(user.uid).then(setUserData);
       setNotifEnabled(isDailyEnabled());
     }
-  }, [user]);
+  }, [user, selectedEnfant]);
+
+  // Charger les données du mois courant pour le popup
+  useEffect(() => {
+    if (user && selectedEnfant) {
+      const now = new Date();
+      const enf = enfants.find((e) => e.id === selectedEnfant);
+      getMoisData(user.uid, selectedEnfant, now.getFullYear(), now.getMonth()).then((d) => {
+        if (d) {
+          setMoisData(d);
+        } else if (enf) {
+          setMoisData(defaultMoisData(selectedEnfant, now.getFullYear(), now.getMonth(), enf));
+        }
+      });
+    }
+  }, [user, selectedEnfant, enfants]);
 
   async function handleEnableNotif() {
     const granted = await requestNotificationPermission();
@@ -98,15 +129,15 @@ export default function DashboardPage() {
 
       {/* Quick actions */}
       <div className="grid grid-cols-2 gap-3">
-        <Link
-          href="/mois"
-          className="bg-purple-600 text-white rounded-xl p-4 hover:bg-purple-700 transition-colors"
+        <button
+          onClick={() => setShowPopup(true)}
+          className="bg-purple-600 text-white rounded-xl p-4 hover:bg-purple-700 transition-colors text-left"
         >
           <div className="text-lg font-bold">Saisir mes heures</div>
           <div className="text-purple-200 text-sm mt-1">
             Saisie du jour
           </div>
-        </Link>
+        </button>
         <Link
           href="/enfant/nouveau"
           className="bg-white border-2 border-dashed border-gray-300 rounded-xl p-4 hover:border-purple-400 transition-colors text-center"
@@ -176,6 +207,40 @@ export default function DashboardPage() {
           </div>
         )}
       </div>
+
+      {/* Popup saisie du jour */}
+      {showPopup && moisData && enfants.length > 0 && (
+        <PopupJour
+          enfants={enfants.map((e) => ({
+            id: e.id!,
+            nom: e.nom,
+            taux_horaire: e.taux_horaire,
+            annee_complete: e.annee_complete,
+            heures_normales_semaine: e.heures_normales_semaine,
+            planning_type: e.planning_type || { lundi: 0, mardi: 0, mercredi: 0, jeudi: 0, vendredi: 0, samedi: 0 },
+            indemnite_entretien_jour: e.indemnite_entretien_jour,
+            indemnite_repas: e.indemnite_repas,
+            indemnite_km: e.indemnite_km,
+          }))}
+          enfantActifId={selectedEnfant}
+          annee={new Date().getFullYear()}
+          mois={new Date().getMonth()}
+          jour={new Date().getDate()}
+          joursData={moisData.jours || {}}
+          onSave={async (jour, enfantId, data) => {
+            if (!user) return;
+            const now = new Date();
+            await saveJourData(user.uid, enfantId, now.getFullYear(), now.getMonth(), String(jour), data);
+            setMoisData((prev) => {
+              if (!prev) return prev;
+              return { ...prev, jours: { ...prev.jours, [String(jour)]: data } };
+            });
+          }}
+          onChangeEnfant={(id) => setSelectedEnfant(id)}
+          onChangeJour={() => {}}
+          onClose={() => setShowPopup(false)}
+        />
+      )}
     </div>
   );
 }
