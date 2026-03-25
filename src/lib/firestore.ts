@@ -104,7 +104,7 @@ export async function poserCongesPeriode(
   mois: number,
   jourDebut: number,
   jourFin: number,
-  code: "CPC" | "CPI",
+  code: "CPC" | "CPI" | "CSS",
   planningType: Record<string, number>
 ) {
   const joursSemaine = ["dimanche", "lundi", "mardi", "mercredi", "jeudi", "vendredi", "samedi"];
@@ -122,13 +122,13 @@ export async function poserCongesPeriode(
     // Skip jours non travaillés selon le planning
     if (heuresContrat === 0) continue;
 
-    const jourType: JourType = "conge";
+    const jourType: JourType = code === "CSS" ? "abs_salarie" : "conge";
     joursToSave[String(j)] = {
       type: jourType,
       heures: 0,
       heures_comp: 0,
       heures_sup: 0,
-      heures_contrac: code === "CPC" ? heuresContrat : 0, // CPc = col.O, CPi = vide
+      heures_contrac: code === "CPC" ? heuresContrat : 0, // CPc = col.O, CPi et CSS = vide
       repas: false,
       commentaire: code,
     };

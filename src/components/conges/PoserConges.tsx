@@ -26,7 +26,7 @@ export default function PoserConges({
   const [mois, setMois] = useState(now.getMonth());
   const [jourDebut, setJourDebut] = useState(1);
   const [jourFin, setJourFin] = useState(5);
-  const [code, setCode] = useState<"CPC" | "CPI">(anneeComplete ? "CPC" : "CPI");
+  const [code, setCode] = useState<"CPC" | "CPI" | "CSS">(anneeComplete ? "CPC" : "CPI");
   const [saving, setSaving] = useState(false);
   const [result, setResult] = useState<string | null>(null);
 
@@ -152,6 +152,17 @@ export default function PoserConges({
             >
               CPi (année incomplète)
             </button>
+            <button
+              type="button"
+              onClick={() => setCode("CSS")}
+              className={`flex-1 py-2.5 rounded-lg text-sm font-medium border-2 transition-colors ${
+                code === "CSS"
+                  ? "bg-amber-100 border-amber-400 text-amber-800"
+                  : "bg-white border-gray-200 text-gray-500"
+              }`}
+            >
+              CSS (sans solde)
+            </button>
           </div>
         </div>
 
@@ -181,7 +192,7 @@ export default function PoserConges({
           disabled={saving || previewCount === 0}
           className="w-full py-3 bg-purple-600 text-white rounded-xl font-medium hover:bg-purple-700 disabled:opacity-50 transition-colors"
         >
-          {saving ? "Enregistrement..." : `Poser ${previewCount} jour${previewCount > 1 ? "s" : ""} de ${code === "CPC" ? "CPc" : "CPi"}`}
+          {saving ? "Enregistrement..." : `Poser ${previewCount} jour${previewCount > 1 ? "s" : ""} de ${code === "CPC" ? "CPc" : code === "CPI" ? "CPi" : "CSS"}`}
         </button>
 
         {/* Résultat */}
