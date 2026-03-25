@@ -108,25 +108,18 @@ export default function DashboardPage() {
   const prenom = userData?.nom ? userData.nom.split(" ").pop() ?? "" : "";
 
   return (
-    /* Cancel the parent p-4 padding for full-bleed header */
-    <div className="-mx-4 -mt-4" style={{ background: "#FAF0E6", minHeight: "100vh" }}>
+    <div style={{ background: "#FAF0E6", minHeight: "100vh" }}>
 
       {/* ===== HEADER ===== */}
-      <div className="relative overflow-hidden px-5 pt-8 pb-20" style={{ background: "#F5E6D0" }}>
+      <div className="relative overflow-hidden px-5 pt-6 pb-14 md:pb-20" style={{ background: "#F5E6D0" }}>
         {/* Blob teal haut-gauche */}
         <div
-          className="absolute -top-10 -left-10 w-40 h-40 rounded-full"
+          className="absolute -top-6 -left-6 w-24 h-24 md:w-40 md:h-40 md:-top-10 md:-left-10 rounded-full"
           style={{ background: "#5BB8C4", opacity: 0.75 }}
         />
-        {/* Petit nuage blanc sur le blob */}
-        <svg className="absolute top-6 left-2 w-20 h-10" viewBox="0 0 80 36" fill="none">
-          <ellipse cx="40" cy="24" rx="28" ry="14" fill="white" opacity="0.85" />
-          <ellipse cx="22" cy="28" rx="16" ry="10" fill="white" opacity="0.85" />
-          <ellipse cx="58" cy="28" rx="18" ry="10" fill="white" opacity="0.85" />
-        </svg>
 
         {/* Soleil haut-droite */}
-        <svg className="absolute top-1 right-3 w-28 h-28" viewBox="0 0 110 110" fill="none">
+        <svg className="absolute top-1 right-2 w-16 h-16 md:w-28 md:h-28 md:right-3" viewBox="0 0 110 110" fill="none">
           <circle cx="75" cy="30" r="20" fill="#F4B942" />
           {[0,45,90,135,180,225,270,315].map((angle, i) => {
             const rad = (angle * Math.PI) / 180;
@@ -136,7 +129,6 @@ export default function DashboardPage() {
             const y2 = 30 + 32 * Math.sin(rad);
             return <line key={i} x1={x1} y1={y1} x2={x2} y2={y2} stroke="#F4B942" strokeWidth="3.5" strokeLinecap="round" />;
           })}
-          {/* Nuage sous le soleil */}
           <ellipse cx="55" cy="68" rx="22" ry="12" fill="white" opacity="0.9" />
           <ellipse cx="38" cy="72" rx="14" ry="9" fill="white" opacity="0.9" />
           <ellipse cx="72" cy="72" rx="16" ry="9" fill="white" opacity="0.9" />
@@ -144,16 +136,16 @@ export default function DashboardPage() {
 
         {/* Blob orange bas-droite */}
         <div
-          className="absolute -bottom-12 -right-12 w-48 h-48 rounded-full"
+          className="absolute -bottom-8 -right-8 w-32 h-32 md:w-48 md:h-48 md:-bottom-12 md:-right-12 rounded-full"
           style={{ background: "#E8855B", opacity: 0.45 }}
         />
 
         {/* Texte */}
-        <div className="relative z-10 mt-2">
-          <h1 className="text-3xl font-extrabold tracking-tight" style={{ color: "#2D2D2D" }}>
+        <div className="relative z-10">
+          <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight" style={{ color: "#2D2D2D" }}>
             Bonjour {prenom ? prenom.toUpperCase() : ""} !
           </h1>
-          <p className="mt-1 text-sm" style={{ color: "#7A6B5A" }}>
+          <p className="mt-0.5 text-sm" style={{ color: "#7A6B5A" }}>
             {now.toLocaleDateString("fr-FR", {
               weekday: "long",
               day: "numeric",
@@ -165,7 +157,7 @@ export default function DashboardPage() {
       </div>
 
       {/* ===== CONTENU ===== */}
-      <div className="px-4 -mt-10 space-y-5 pb-28">
+      <div className="px-4 -mt-8 md:-mt-10 space-y-4 pb-28">
 
         {/* Notification banner */}
         {!notifEnabled && getNotificationPermission() !== "denied" && (
@@ -193,22 +185,22 @@ export default function DashboardPage() {
         <div className="grid grid-cols-2 gap-3">
           <button
             onClick={() => setShowPopup(true)}
-            className="rounded-2xl p-4 text-left relative overflow-hidden shadow-md"
-            style={{ background: "#2D3442", minHeight: "110px" }}
+            className="rounded-2xl p-3 md:p-4 text-left relative overflow-hidden shadow-md"
+            style={{ background: "#2D3442", minHeight: "88px" }}
           >
             <p className="text-sm font-bold text-white">Saisir mes heures</p>
-            <p className="text-xs mt-1" style={{ color: "#9CA8BB" }}>Saisie du jour</p>
-            <span className="absolute bottom-3 right-3 text-4xl" style={{ opacity: 0.65 }}>🧮</span>
+            <p className="text-xs mt-0.5" style={{ color: "#9CA8BB" }}>Saisie du jour</p>
+            <span className="absolute bottom-2 right-2 text-3xl md:text-4xl" style={{ opacity: 0.65 }}>🧮</span>
           </button>
 
           <Link
             href="/enfant/nouveau"
-            className="rounded-2xl p-4 text-left relative overflow-hidden shadow-md"
-            style={{ background: "#2D3442", minHeight: "110px" }}
+            className="rounded-2xl p-3 md:p-4 text-left relative overflow-hidden shadow-md"
+            style={{ background: "#2D3442", minHeight: "88px" }}
           >
-            <p className="text-2xl font-black text-white leading-none mb-1">+</p>
+            <p className="text-xl font-black text-white leading-none mb-0.5">+</p>
             <p className="text-sm font-bold text-white">Ajouter un enfant</p>
-            <span className="absolute bottom-3 right-3 text-4xl" style={{ opacity: 0.65 }}>🌱</span>
+            <span className="absolute bottom-2 right-2 text-3xl md:text-4xl" style={{ opacity: 0.65 }}>🌱</span>
           </Link>
         </div>
 

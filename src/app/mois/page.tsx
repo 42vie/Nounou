@@ -124,7 +124,7 @@ export default function MoisPage() {
   const brutBase = mensu.heures_mensualisees * taux;
 
   return (
-    <div className="space-y-4 max-w-4xl mx-auto">
+    <div className="space-y-4 max-w-4xl mx-auto px-4 py-4">
       {/* Sélecteurs */}
       <div className="flex gap-3 items-center flex-wrap">
         <select

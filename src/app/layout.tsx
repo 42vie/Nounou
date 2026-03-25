@@ -28,6 +28,7 @@ export const viewport: Viewport = {
   initialScale: 1,
   maximumScale: 1,
   userScalable: false,
+  viewportFit: "cover",
 };
 
 export default function RootLayout({
@@ -40,7 +41,7 @@ export default function RootLayout({
       <body className="min-h-screen antialiased" style={{ background: "#FAF0E6" }}>
         <AuthProvider>
           <main className="pb-20">
-            <div className="max-w-7xl mx-auto p-4">{children}</div>
+            {children}
           </main>
           <Navigation />
           <NotificationChecker />

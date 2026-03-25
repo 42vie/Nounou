@@ -137,7 +137,7 @@ export default function EnfantPage() {
   const now = new Date();
 
   return (
-    <div className="max-w-2xl mx-auto space-y-6">
+    <div className="max-w-2xl mx-auto space-y-6 px-4 py-4">
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-bold text-gray-900">{enfant.nom}</h1>
         <div className="flex gap-2">
