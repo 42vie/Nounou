@@ -122,7 +122,7 @@ export function BulletinComplet(p: BulletinCompletProps) {
             <td colSpan={4} rowSpan={2} style={{ width: "25%", verticalAlign: "top", padding: "4px" }}>
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src="/logo-proassmat.svg"
+                src="/logo-proassmat.png"
                 alt="PROASSMAT & ASSFAM"
                 style={{ width: "100%", maxWidth: "140px", height: "auto" }}
               />
