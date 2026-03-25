@@ -295,7 +295,7 @@ export default function FichePage() {
     : "";
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 max-w-5xl mx-auto px-4 py-4">
       {/* Controls */}
       <div className="no-print flex justify-between items-center">
         <button onClick={() => router.back()} className="text-sm text-purple-600 hover:underline">

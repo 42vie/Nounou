@@ -12,7 +12,7 @@ import PoserConges from "@/components/conges/PoserConges";
 import { showToast } from "@/components/Toast";
 
 export default function EnfantPage() {
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
   const router = useRouter();
   const params = useParams();
   const id = params.id as string;
@@ -22,6 +22,10 @@ export default function EnfantPage() {
   const [savedMsg, setSavedMsg] = useState(false);
 
   const [form, setForm] = useState<Record<string, string | number | boolean>>({});
+
+  useEffect(() => {
+    if (!loading && !user) router.push("/login");
+  }, [user, loading, router]);
 
   useEffect(() => {
     if (user && id) {
@@ -141,6 +145,10 @@ export default function EnfantPage() {
     if (!user || !confirm("Supprimer ce contrat ?")) return;
     await deleteEnfant(user.uid, id);
     router.push("/");
+  }
+
+  if (loading || !user) {
+    return <div className="p-8 text-center text-gray-400">Chargement...</div>;
   }
 
   if (!enfant) {

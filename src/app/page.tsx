@@ -37,9 +37,7 @@ export default function DashboardPage() {
   const [cpExpanded, setCpExpanded] = useState(true);
 
   useEffect(() => {
-    if (!loading && !user) {
-      router.push("/login");
-    }
+    if (!loading && !user) router.push("/login");
   }, [user, loading, router]);
 
   useEffect(() => {
@@ -53,7 +51,6 @@ export default function DashboardPage() {
     }
   }, [user, selectedEnfant]);
 
-  // Charger les données du mois courant pour le popup
   useEffect(() => {
     if (user && selectedEnfant) {
       const now = new Date();
@@ -68,7 +65,6 @@ export default function DashboardPage() {
     }
   }, [user, selectedEnfant, enfants]);
 
-  // Load mois data for all enfants (for CP widget)
   useEffect(() => {
     if (user && enfants.length > 0) {
       const now = new Date();
@@ -99,7 +95,7 @@ export default function DashboardPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-96">
-        <div className="text-gray-400">Chargement...</div>
+        <div style={{ color: "#C97B4A" }}>Chargement...</div>
       </div>
     );
   }
@@ -109,17 +105,48 @@ export default function DashboardPage() {
   const now = new Date();
   const moisCourant = now.getMonth();
   const anneeCourante = now.getFullYear();
+  const prenom = userData?.nom ? userData.nom.split(" ").pop() ?? "" : "";
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex justify-between items-start">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">
-            Bonjour{userData?.nom ? ` ${userData.nom.split(" ").pop()}` : ""} !
+    <div style={{ background: "#FAF0E6", minHeight: "100vh" }}>
+
+      {/* ===== HEADER ===== */}
+      <div className="relative overflow-hidden px-5 pt-6 pb-14 md:pb-20" style={{ background: "#F5E6D0" }}>
+        {/* Blob teal haut-gauche */}
+        <div
+          className="absolute -top-6 -left-6 w-24 h-24 md:w-40 md:h-40 md:-top-10 md:-left-10 rounded-full"
+          style={{ background: "#5BB8C4", opacity: 0.75 }}
+        />
+
+        {/* Soleil haut-droite */}
+        <svg className="absolute top-1 right-2 w-16 h-16 md:w-28 md:h-28 md:right-3" viewBox="0 0 110 110" fill="none">
+          <circle cx="75" cy="30" r="20" fill="#F4B942" />
+          {[0,45,90,135,180,225,270,315].map((angle, i) => {
+            const rad = (angle * Math.PI) / 180;
+            const x1 = 75 + 24 * Math.cos(rad);
+            const y1 = 30 + 24 * Math.sin(rad);
+            const x2 = 75 + 32 * Math.cos(rad);
+            const y2 = 30 + 32 * Math.sin(rad);
+            return <line key={i} x1={x1} y1={y1} x2={x2} y2={y2} stroke="#F4B942" strokeWidth="3.5" strokeLinecap="round" />;
+          })}
+          <ellipse cx="55" cy="68" rx="22" ry="12" fill="white" opacity="0.9" />
+          <ellipse cx="38" cy="72" rx="14" ry="9" fill="white" opacity="0.9" />
+          <ellipse cx="72" cy="72" rx="16" ry="9" fill="white" opacity="0.9" />
+        </svg>
+
+        {/* Blob orange bas-droite */}
+        <div
+          className="absolute -bottom-8 -right-8 w-32 h-32 md:w-48 md:h-48 md:-bottom-12 md:-right-12 rounded-full"
+          style={{ background: "#E8855B", opacity: 0.45 }}
+        />
+
+        {/* Texte */}
+        <div className="relative z-10">
+          <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight" style={{ color: "#2D2D2D" }}>
+            Bonjour {prenom ? prenom.toUpperCase() : ""} !
           </h1>
-          <p className="text-gray-500 text-sm mt-1">
-            {new Date().toLocaleDateString("fr-FR", {
+          <p className="mt-0.5 text-sm" style={{ color: "#7A6B5A" }}>
+            {now.toLocaleDateString("fr-FR", {
               weekday: "long",
               day: "numeric",
               month: "long",
@@ -129,195 +156,246 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {/* Notification banner */}
-      {!notifEnabled && getNotificationPermission() !== "denied" && (
-        <div className="bg-purple-50 border border-purple-200 rounded-xl p-4 flex items-center justify-between">
-          <div>
-            <p className="text-sm font-medium text-purple-900">
-              Rappel quotidien de saisie des heures
-            </p>
-            <p className="text-xs text-purple-600 mt-0.5">
-              Recevez une notification chaque soir pour ne pas oublier
-            </p>
-          </div>
-          <button
-            onClick={handleEnableNotif}
-            className="px-4 py-2 bg-purple-600 text-white rounded-lg text-sm font-medium hover:bg-purple-700"
+      {/* ===== CONTENU ===== */}
+      <div className="px-4 -mt-8 md:-mt-10 space-y-4 pb-28">
+
+        {/* Notification banner */}
+        {!notifEnabled && getNotificationPermission() !== "denied" && (
+          <div
+            className="rounded-2xl p-4 flex items-center justify-between shadow-sm"
+            style={{ background: "#5BB8C4" }}
           >
-            Activer
-          </button>
-        </div>
-      )}
-
-      {/* Quick actions */}
-      <div className="grid grid-cols-2 gap-3">
-        <button
-          onClick={() => setShowPopup(true)}
-          className="bg-purple-600 text-white rounded-xl p-4 hover:bg-purple-700 transition-colors text-left"
-        >
-          <div className="text-lg font-bold">Saisir mes heures</div>
-          <div className="text-purple-200 text-sm mt-1">
-            Saisie du jour
-          </div>
-        </button>
-        <Link
-          href="/enfant/nouveau"
-          className="bg-white border-2 border-dashed border-gray-300 rounded-xl p-4 hover:border-purple-400 transition-colors text-center"
-        >
-          <div className="text-2xl">+</div>
-          <div className="text-sm text-gray-500">Ajouter un enfant</div>
-        </Link>
-      </div>
-
-      {/* Enfants */}
-      <div>
-        <h2 className="text-lg font-bold text-gray-900 mb-3">
-          Mes contrats ({enfants.length})
-        </h2>
-        {enfants.length === 0 ? (
-          <div className="bg-white rounded-xl border p-8 text-center">
-            <p className="text-gray-500">Aucun contrat enregistré</p>
-            <Link
-              href="/enfant/nouveau"
-              className="inline-block mt-3 px-4 py-2 bg-purple-600 text-white rounded-lg text-sm font-medium"
+            <div>
+              <p className="text-sm font-bold text-white">Rappel quotidien</p>
+              <p className="text-xs mt-0.5" style={{ color: "#D4F2F5" }}>
+                Saisie des heures chaque soir à 19h
+              </p>
+            </div>
+            <button
+              onClick={handleEnableNotif}
+              className="px-3 py-1.5 rounded-xl text-xs font-bold shadow"
+              style={{ background: "white", color: "#5BB8C4" }}
             >
-              Ajouter un enfant
-            </Link>
-          </div>
-        ) : (
-          <div className="grid gap-3 md:grid-cols-2">
-            {enfants.map((enfant) => (
-              <Link
-                key={enfant.id}
-                href={`/enfant/${enfant.id}`}
-                className="bg-white rounded-xl border p-4 hover:shadow-md transition-shadow"
-              >
-                <div className="flex justify-between items-start">
-                  <div>
-                    <h3 className="font-bold text-gray-900">{enfant.nom}</h3>
-                    <p className="text-sm text-gray-500">
-                      Employeur : {enfant.emp_nom}
-                    </p>
-                  </div>
-                  <span className="px-2 py-0.5 bg-purple-100 text-purple-700 text-xs rounded-full font-medium">
-                    {enfant.type_contrat === "CDI" ? "CDI" : "CDD"}
-                  </span>
-                </div>
-                <div className="mt-3 flex gap-4 text-xs text-gray-500">
-                  <span>{enfant.heures_normales_semaine}h/sem</span>
-                  <span>{enfant.taux_horaire} €/h</span>
-                  <span>IE: {enfant.indemnite_entretien_jour} €/j</span>
-                </div>
-                <div className="mt-2 flex gap-2">
-                  <Link
-                    href={`/fiche/${enfant.id}/${anneeCourante}/${moisCourant}`}
-                    onClick={(e) => e.stopPropagation()}
-                    className="text-xs px-2 py-1 bg-gray-100 rounded hover:bg-gray-200"
-                  >
-                    Bulletin
-                  </Link>
-                  <Link
-                    href={`/conges/${enfant.id}`}
-                    onClick={(e) => e.stopPropagation()}
-                    className="text-xs px-2 py-1 bg-gray-100 rounded hover:bg-gray-200"
-                  >
-                    Congés
-                  </Link>
-                </div>
-              </Link>
-            ))}
+              Activer
+            </button>
           </div>
         )}
-      </div>
 
-      {/* Congés payés tracking */}
-      {enfants.length > 0 && (
-        <div>
+        {/* ===== Actions rapides ===== */}
+        <div className="grid grid-cols-2 gap-3">
           <button
-            onClick={() => setCpExpanded(!cpExpanded)}
-            className="flex items-center gap-2 w-full text-left mb-3"
+            onClick={() => setShowPopup(true)}
+            className="rounded-2xl p-3 md:p-4 text-left relative overflow-hidden shadow-md"
+            style={{ background: "#2D3442", minHeight: "88px" }}
           >
-            <h2 className="text-lg font-bold text-gray-900">
-              Congés payés
-            </h2>
-            <svg
-              className={`w-4 h-4 text-gray-500 transition-transform ${cpExpanded ? "rotate-180" : ""}`}
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-            </svg>
+            <p className="text-sm font-bold text-white">Saisir mes heures</p>
+            <p className="text-xs mt-0.5" style={{ color: "#9CA8BB" }}>Saisie du jour</p>
+            <span className="absolute bottom-2 right-2 text-3xl md:text-4xl" style={{ opacity: 0.65 }}>🧮</span>
           </button>
-          {cpExpanded && (
-            <div className="grid gap-3 md:grid-cols-2">
-              {enfants.map((enfant) => {
-                const md = allMoisData[enfant.id!];
-                const soldeInitial = enfant.cp_solde_initial || 0;
-                // Count CP pris (CPC/CPI seulement — PAS CSS qui est sans solde)
-                const joursConge = md
-                  ? Object.values(md.jours).filter((j) =>
-                      j.commentaire === "CPC" || j.commentaire === "CPI"
-                    ).length
-                  : 0;
-                // Use MoisData CP fields
-                const cpAcquis = md ? (md.cp_n_jours_enfant || 0) : 0;
-                const cpPris = joursConge;
-                const solde = soldeInitial + cpAcquis - cpPris;
-                const totalDispo = soldeInitial + cpAcquis;
-                const pctUsed = totalDispo > 0 ? Math.min((cpPris / totalDispo) * 100, 100) : 0;
 
-                return (
-                  <div
-                    key={enfant.id}
-                    className="bg-white rounded-xl border p-4"
-                  >
-                    <div className="flex justify-between items-start mb-3">
-                      <h3 className="font-bold text-gray-900">{enfant.nom}</h3>
-                      <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-purple-100 text-purple-700">
-                        Solde : {solde} j
-                      </span>
+          <Link
+            href="/enfant/nouveau"
+            className="rounded-2xl p-3 md:p-4 text-left relative overflow-hidden shadow-md"
+            style={{ background: "#2D3442", minHeight: "88px" }}
+          >
+            <p className="text-xl font-black text-white leading-none mb-0.5">+</p>
+            <p className="text-sm font-bold text-white">Ajouter un enfant</p>
+            <span className="absolute bottom-2 right-2 text-3xl md:text-4xl" style={{ opacity: 0.65 }}>🌱</span>
+          </Link>
+        </div>
+
+        {/* ===== Mes contrats ===== */}
+        <div>
+          <h2 className="text-lg font-extrabold mb-3" style={{ color: "#2D2D2D" }}>
+            Mes contrats ({enfants.length})
+          </h2>
+
+          {enfants.length === 0 ? (
+            <div
+              className="rounded-2xl p-6 text-center shadow-md relative overflow-hidden"
+              style={{ background: "#C97B4A" }}
+            >
+              {/* Déco */}
+              <div
+                className="absolute -bottom-6 -right-6 w-28 h-28 rounded-full"
+                style={{ background: "#E8855B", opacity: 0.5 }}
+              />
+              <div className="relative z-10">
+                <div className="text-5xl mb-3">🤝</div>
+                <p className="text-white font-semibold mb-4">Aucun contrat enregistré</p>
+                <Link
+                  href="/enfant/nouveau"
+                  className="inline-block px-5 py-2 rounded-full text-sm font-bold shadow"
+                  style={{ background: "rgba(255,255,255,0.22)", color: "white", border: "1.5px solid rgba(255,255,255,0.45)" }}
+                >
+                  Ajouter un enfant
+                </Link>
+              </div>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {enfants.map((enfant) => (
+                <Link
+                  key={enfant.id}
+                  href={`/enfant/${enfant.id}`}
+                  className="block rounded-2xl p-4 shadow-sm"
+                  style={{ background: "white" }}
+                >
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <h3 className="font-bold" style={{ color: "#2D2D2D" }}>{enfant.nom}</h3>
+                      <p className="text-sm" style={{ color: "#7A6B5A" }}>
+                        Employeur : {enfant.emp_nom}
+                      </p>
                     </div>
-                    <div className="space-y-1.5 text-sm text-gray-600">
-                      <div className="flex justify-between">
-                        <span>Solde initial</span>
-                        <span className="font-medium text-gray-900">{soldeInitial} j</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span>CP acquis (mois)</span>
-                        <span className="font-medium text-green-700">+{cpAcquis} j</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span>CP pris (mois)</span>
-                        <span className="font-medium text-red-600">-{cpPris} j</span>
-                      </div>
-                    </div>
-                    {/* Progress bar */}
-                    <div className="mt-3">
-                      <div className="flex justify-between text-xs text-gray-400 mb-1">
-                        <span>Utilisation</span>
-                        <span>{Math.round(pctUsed)}%</span>
-                      </div>
-                      <div className="w-full h-2 bg-purple-100 rounded-full overflow-hidden">
-                        <div
-                          className="h-full bg-purple-500 rounded-full transition-all"
-                          style={{ width: `${pctUsed}%` }}
-                        />
-                      </div>
-                    </div>
+                    <span
+                      className="px-2 py-0.5 rounded-full text-xs font-bold"
+                      style={{ background: "#FFF0E6", color: "#C97B4A" }}
+                    >
+                      {enfant.type_contrat === "CDI" ? "CDI" : "CDD"}
+                    </span>
+                  </div>
+
+                  <div className="mt-3 flex gap-4 text-xs" style={{ color: "#7A6B5A" }}>
+                    <span>{enfant.heures_normales_semaine}h/sem</span>
+                    <span>{enfant.taux_horaire} €/h</span>
+                    <span>IE: {enfant.indemnite_entretien_jour} €/j</span>
+                  </div>
+
+                  <div className="mt-3 flex gap-2">
+                    <Link
+                      href={`/fiche/${enfant.id}/${anneeCourante}/${moisCourant}`}
+                      onClick={(e) => e.stopPropagation()}
+                      className="text-xs px-3 py-1.5 rounded-full font-semibold"
+                      style={{ background: "#FFF0E6", color: "#C97B4A" }}
+                    >
+                      Bulletin
+                    </Link>
                     <Link
                       href={`/conges/${enfant.id}`}
-                      className="inline-block mt-3 text-xs text-purple-600 font-medium hover:text-purple-800"
+                      onClick={(e) => e.stopPropagation()}
+                      className="text-xs px-3 py-1.5 rounded-full font-semibold"
+                      style={{ background: "#E8F8FA", color: "#5BB8C4" }}
                     >
-                      Voir détail →
+                      Congés
                     </Link>
                   </div>
-                );
-              })}
+                </Link>
+              ))}
             </div>
           )}
         </div>
-      )}
+
+        {/* ===== Congés payés ===== */}
+        {enfants.length > 0 && (
+          <div>
+            <button
+              onClick={() => setCpExpanded(!cpExpanded)}
+              className="flex items-center gap-2 w-full text-left mb-3"
+            >
+              <h2 className="text-lg font-extrabold" style={{ color: "#2D2D2D" }}>
+                Congés payés
+              </h2>
+              <svg
+                className="w-4 h-4 transition-transform duration-200"
+                style={{
+                  color: "#7A6B5A",
+                  transform: cpExpanded ? "rotate(180deg)" : "rotate(0deg)",
+                }}
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+
+            {cpExpanded && (
+              <div
+                className="rounded-2xl p-4 shadow-md"
+                style={{ background: "#C4956A" }}
+              >
+                <div className="grid gap-3 md:grid-cols-2">
+                  {enfants.map((enfant) => {
+                    const md = allMoisData[enfant.id!];
+                    const soldeInitial = enfant.cp_solde_initial || 0;
+                    const joursConge = md
+                      ? Object.values(md.jours).filter(
+                          (j) => j.commentaire === "CPC" || j.commentaire === "CPI"
+                        ).length
+                      : 0;
+                    const cpAcquis = md ? md.cp_n_jours_enfant || 0 : 0;
+                    const cpPris = joursConge;
+                    const solde = soldeInitial + cpAcquis - cpPris;
+                    const totalDispo = soldeInitial + cpAcquis;
+                    const pctUsed =
+                      totalDispo > 0 ? Math.min((cpPris / totalDispo) * 100, 100) : 0;
+
+                    return (
+                      <div
+                        key={enfant.id}
+                        className="rounded-xl p-3"
+                        style={{ background: "rgba(255,255,255,0.22)" }}
+                      >
+                        <div className="flex justify-between items-center mb-2">
+                          <h3 className="font-bold text-white text-sm">{enfant.nom}</h3>
+                          <span
+                            className="text-xs font-bold px-2 py-0.5 rounded-full"
+                            style={{ background: "rgba(255,255,255,0.28)", color: "white" }}
+                          >
+                            {solde} j
+                          </span>
+                        </div>
+
+                        <div className="space-y-1 text-xs" style={{ color: "#F5E0CC" }}>
+                          <div className="flex justify-between">
+                            <span>Solde initial</span>
+                            <span className="font-semibold text-white">{soldeInitial} j</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span>Acquis ce mois</span>
+                            <span className="font-semibold" style={{ color: "#BBFFD8" }}>
+                              +{cpAcquis} j
+                            </span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span>Pris ce mois</span>
+                            <span className="font-semibold" style={{ color: "#FFD5D5" }}>
+                              -{cpPris} j
+                            </span>
+                          </div>
+                        </div>
+
+                        <div className="mt-2.5">
+                          <div
+                            className="w-full h-1.5 rounded-full"
+                            style={{ background: "rgba(255,255,255,0.2)" }}
+                          >
+                            <div
+                              className="h-full rounded-full transition-all"
+                              style={{
+                                width: `${pctUsed}%`,
+                                background: "rgba(255,255,255,0.65)",
+                              }}
+                            />
+                          </div>
+                        </div>
+
+                        <Link
+                          href={`/conges/${enfant.id}`}
+                          className="inline-block mt-2 text-xs text-white underline underline-offset-2"
+                        >
+                          Voir détail →
+                        </Link>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
 
       {/* Popup saisie du jour */}
       {showPopup && moisData && enfants.length > 0 && (
@@ -328,20 +406,27 @@ export default function DashboardPage() {
             taux_horaire: e.taux_horaire,
             annee_complete: e.annee_complete,
             heures_normales_semaine: e.heures_normales_semaine,
-            planning_type: e.planning_type || { lundi: 0, mardi: 0, mercredi: 0, jeudi: 0, vendredi: 0, samedi: 0 },
+            planning_type: e.planning_type || {
+              lundi: 0,
+              mardi: 0,
+              mercredi: 0,
+              jeudi: 0,
+              vendredi: 0,
+              samedi: 0,
+            },
             indemnite_entretien_jour: e.indemnite_entretien_jour,
             indemnite_repas: e.indemnite_repas,
             indemnite_km: e.indemnite_km,
           }))}
           enfantActifId={selectedEnfant}
-          annee={new Date().getFullYear()}
-          mois={new Date().getMonth()}
-          jour={new Date().getDate()}
+          annee={now.getFullYear()}
+          mois={now.getMonth()}
+          jour={now.getDate()}
           joursData={moisData.jours || {}}
           onSave={async (jour, enfantId, data) => {
             if (!user) return;
-            const now = new Date();
-            await saveJourData(user.uid, enfantId, now.getFullYear(), now.getMonth(), String(jour), data);
+            const n = new Date();
+            await saveJourData(user.uid, enfantId, n.getFullYear(), n.getMonth(), String(jour), data);
             setMoisData((prev) => {
               if (!prev) return prev;
               return { ...prev, jours: { ...prev.jours, [String(jour)]: data } };

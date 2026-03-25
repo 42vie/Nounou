@@ -308,7 +308,7 @@ export default function PopupJour({
   return (
     <div
       className={`
-        fixed inset-0 z-50 flex items-end md:items-center justify-center
+        fixed inset-0 z-[60] flex items-end md:items-center justify-center
         transition-all duration-200
         ${isVisible ? "bg-black/40 backdrop-blur-sm" : "bg-transparent"}
       `}
@@ -317,7 +317,7 @@ export default function PopupJour({
       <div
         className={`
           bg-white rounded-t-3xl md:rounded-2xl w-full md:max-w-lg
-          max-h-[95vh] md:max-h-[90vh]
+          max-h-[100dvh] md:max-h-[90vh]
           flex flex-col
           shadow-2xl
           transition-transform duration-300 ease-out
@@ -468,10 +468,12 @@ export default function PopupJour({
                     onChange={(e) => {
                       const val = parseFloat(e.target.value) || 0;
                       setHeures(val);
-                      // Auto-calc H. complémentaires si heures > planning
+                      // Auto-calc H. supplémentaires si heures > planning
                       if (selectedCode === "WORK" && val > planningHours && planningHours > 0) {
-                        setHeuresComp(Math.round((val - planningHours) * 100) / 100);
+                        setHeuresSup(Math.round((val - planningHours) * 100) / 100);
+                        setHeuresComp(0);
                       } else if (selectedCode === "WORK") {
+                        setHeuresSup(0);
                         setHeuresComp(0);
                       }
                     }}
