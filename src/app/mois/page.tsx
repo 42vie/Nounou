@@ -13,11 +13,11 @@ import {
   defaultMoisData,
   Enfant,
   MoisData,
-  JourData,
 } from "@/lib/firestore";
 import { MOIS_NOMS, formatEuro, getDaysInMonth } from "@/lib/utils";
 import { CalendrierMois } from "@/components/calendrier/CalendrierMois";
 import { calculerMensualisation } from "@/lib/calculs/mensualisation";
+import PopupJour from "@/components/saisie/PopupJour";
 
 export default function MoisPage() {
   const { user, loading } = useAuth();
@@ -28,6 +28,7 @@ export default function MoisPage() {
   const [annee, setAnnee] = useState(new Date().getFullYear());
   const [moisData, setMoisData] = useState<MoisData | null>(null);
   const [enfant, setEnfant] = useState<Enfant | null>(null);
+  const [popupJour, setPopupJour] = useState<number | null>(null);
 
   useEffect(() => {
     if (!loading && !user) router.push("/login");
@@ -59,15 +60,6 @@ export default function MoisPage() {
   useEffect(() => {
     loadMois();
   }, [loadMois]);
-
-  async function handleSaveJour(jour: string, data: JourData) {
-    if (!user || !selectedEnfant) return;
-    await saveJourData(user.uid, selectedEnfant, annee, moisIdx, jour, data);
-    setMoisData((prev) => {
-      if (!prev) return prev;
-      return { ...prev, jours: { ...prev.jours, [jour]: data } };
-    });
-  }
 
   function handleApplyPlanning() {
     if (!enfant || !moisData) return;
@@ -199,8 +191,41 @@ export default function MoisPage() {
           mois={moisIdx}
           jours={moisData.jours || {}}
           planningType={enfant.planning_type || {}}
-          onSaveJour={handleSaveJour}
+          onSelectJour={(jour) => setPopupJour(jour)}
           onApplyPlanning={handleApplyPlanning}
+        />
+      )}
+
+      {/* Popup saisie journalière */}
+      {popupJour !== null && moisData && (
+        <PopupJour
+          enfants={enfants.map((e) => ({
+            id: e.id!,
+            nom: e.nom,
+            taux_horaire: e.taux_horaire,
+            annee_complete: e.annee_complete,
+            heures_normales_semaine: e.heures_normales_semaine,
+            planning_type: e.planning_type || { lundi: 0, mardi: 0, mercredi: 0, jeudi: 0, vendredi: 0, samedi: 0 },
+            indemnite_entretien_jour: e.indemnite_entretien_jour,
+            indemnite_repas: e.indemnite_repas,
+            indemnite_km: e.indemnite_km,
+          }))}
+          enfantActifId={selectedEnfant}
+          annee={annee}
+          mois={moisIdx}
+          jour={popupJour}
+          joursData={moisData.jours || {}}
+          onSave={async (jour, enfantId, data) => {
+            if (!user) return;
+            await saveJourData(user.uid, enfantId, annee, moisIdx, String(jour), data);
+            setMoisData((prev) => {
+              if (!prev) return prev;
+              return { ...prev, jours: { ...prev.jours, [String(jour)]: data } };
+            });
+          }}
+          onChangeEnfant={(id) => setSelectedEnfant(id)}
+          onChangeJour={(jour) => setPopupJour(jour)}
+          onClose={() => setPopupJour(null)}
         />
       )}
 
