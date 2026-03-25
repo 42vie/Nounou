@@ -158,6 +158,22 @@ export default function EnfantPage() {
           Contrat enregistré avec succès
         </div>
       )}
+
+      {/* Alerte date d'embauche manquante */}
+      {!editing && (!enfant.date_embauche || !enfant.date_embauche?.toDate?.()) && (
+        <div className="bg-amber-50 border border-amber-200 text-amber-800 px-4 py-3 rounded-xl text-sm flex items-center gap-2">
+          <svg className="w-5 h-5 text-amber-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
+          </svg>
+          <div>
+            <span className="font-medium">Date d&apos;embauche manquante.</span>{" "}
+            Le prorata du 1er mois et les congés payés ne seront pas calculés correctement.{" "}
+            <button onClick={() => setEditing(true)} className="text-amber-900 underline font-medium">
+              Modifier le contrat
+            </button>
+          </div>
+        </div>
+      )}
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-bold text-gray-900">{enfant.nom}</h1>
         <div className="flex gap-2">
