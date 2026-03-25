@@ -82,7 +82,7 @@ export default function MoisPage() {
           heures,
           heures_comp: 0,
           heures_sup: 0,
-          heures_contrac: heures,
+          heures_contrac: 0, // Col. O vide pour WORK — seulement pour les codes (FERIE, CPC, etc.)
           repas: true,
           commentaire: "",
         };
