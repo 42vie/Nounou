@@ -20,8 +20,11 @@ export function Navigation() {
   if (!user) return null;
 
   return (
-    <nav className="fixed bottom-0 inset-x-0 z-50 backdrop-blur-xl bg-white/70 border-t border-white/20 shadow-[0_-2px_10px_rgba(0,0,0,0.08)]">
-      <div className="flex items-center justify-around h-[60px] max-w-2xl mx-auto px-2">
+    <nav
+      className="fixed bottom-0 inset-x-0 z-50 border-t shadow-[0_-2px_12px_rgba(0,0,0,0.1)]"
+      style={{ background: "#F5E6D0", borderColor: "#E8D4BC" }}
+    >
+      <div className="flex items-center justify-around h-[62px] max-w-2xl mx-auto px-2">
         {navItems.slice(0, 2).map((item) => {
           const Icon = item.icon;
           const isActive = pathname === item.href;
@@ -29,29 +32,22 @@ export function Navigation() {
             <Link
               key={item.href}
               href={item.href}
-              className={`flex flex-col items-center gap-0.5 px-3 py-1 rounded-xl transition-colors ${
-                isActive
-                  ? "text-purple-700"
-                  : "text-gray-500 hover:text-gray-700"
-              }`}
+              className="flex flex-col items-center gap-0.5 px-3 py-1 rounded-xl transition-colors"
+              style={{ color: isActive ? "#C97B4A" : "#9A8878" }}
             >
               <div
-                className={`p-1 rounded-lg ${
-                  isActive ? "bg-purple-100" : ""
-                }`}
+                className="p-1 rounded-lg"
+                style={{ background: isActive ? "#FFF0E6" : "transparent" }}
               >
                 <Icon size={22} strokeWidth={isActive ? 2.5 : 2} />
               </div>
-              <span className="text-[10px] font-medium">{item.label}</span>
+              <span className="text-[10px] font-semibold">{item.label}</span>
             </Link>
           );
         })}
 
         {/* Logo center */}
-        <Link
-          href="/"
-          className="flex flex-col items-center gap-0.5 px-3 py-1"
-        >
+        <Link href="/" className="flex flex-col items-center gap-0.5 px-3 py-1">
           <Image
             src="/logo-assmatpaie.png"
             alt="AssMatPaie"
@@ -59,7 +55,7 @@ export function Navigation() {
             height={30}
             className="rounded-lg"
           />
-          <span className="text-[9px] font-semibold text-purple-900">
+          <span className="text-[9px] font-semibold" style={{ color: "#C97B4A" }}>
             AssMatPaie
           </span>
         </Link>
@@ -71,20 +67,16 @@ export function Navigation() {
             <Link
               key={item.href}
               href={item.href}
-              className={`flex flex-col items-center gap-0.5 px-3 py-1 rounded-xl transition-colors ${
-                isActive
-                  ? "text-purple-700"
-                  : "text-gray-500 hover:text-gray-700"
-              }`}
+              className="flex flex-col items-center gap-0.5 px-3 py-1 rounded-xl transition-colors"
+              style={{ color: isActive ? "#C97B4A" : "#9A8878" }}
             >
               <div
-                className={`p-1 rounded-lg ${
-                  isActive ? "bg-purple-100" : ""
-                }`}
+                className="p-1 rounded-lg"
+                style={{ background: isActive ? "#FFF0E6" : "transparent" }}
               >
                 <Icon size={22} strokeWidth={isActive ? 2.5 : 2} />
               </div>
-              <span className="text-[10px] font-medium">{item.label}</span>
+              <span className="text-[10px] font-semibold">{item.label}</span>
             </Link>
           );
         })}
