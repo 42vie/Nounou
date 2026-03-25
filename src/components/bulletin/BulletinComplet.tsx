@@ -119,13 +119,13 @@ export function BulletinComplet(p: BulletinCompletProps) {
       <table style={{ marginBottom: 0 }}>
         <tbody>
           <tr>
-            <td colSpan={4} rowSpan={2} style={{ width: "25%", ...bold, color: "#c2185b", fontSize: "11px", verticalAlign: "top" }}>
-              <div style={{ fontSize: "14px", fontWeight: "bold" }}>
-                <span style={{ color: "#e91e63" }}>PRO</span>
-                <span style={{ color: "#1a237e" }}>ASSMAT</span>
-              </div>
-              <div style={{ fontSize: "10px", color: "#1a237e" }}>& ASSFAM</div>
-              <div style={{ fontSize: "7px", color: "#666", marginTop: 2 }}>UN SYNDICAT QUI VOUS RASSEMBLE</div>
+            <td colSpan={4} rowSpan={2} style={{ width: "25%", verticalAlign: "top", padding: "4px" }}>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/logo-proassmat.png"
+                alt="PROASSMAT & ASSFAM"
+                style={{ width: "100%", maxWidth: "140px", height: "auto" }}
+              />
             </td>
             <td colSpan={7} style={{ ...center, ...bold, fontSize: "11px" }}>
               Bulletin de paie du mois de

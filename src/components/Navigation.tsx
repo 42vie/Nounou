@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useAuth } from "@/lib/auth-context";
 
@@ -23,9 +24,13 @@ export function Navigation() {
       <aside className="hidden md:flex md:flex-col md:w-56 md:fixed md:inset-y-0 bg-white border-r border-gray-200 shadow-sm">
         <div className="p-4 border-b">
           <Link href="/" className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-purple-600 rounded-lg flex items-center justify-center text-white font-bold text-sm">
-              AP
-            </div>
+            <Image
+              src="/logo-assmatpaie.png"
+              alt="AssMatPaie"
+              width={40}
+              height={40}
+              className="rounded-lg"
+            />
             <span className="font-bold text-purple-900">AssMatPaie</span>
           </Link>
         </div>
