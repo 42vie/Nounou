@@ -53,9 +53,9 @@ export const CODES: CodeJour[] = [
   {
     code: "ANJE",
     label: "ANJE",
-    tooltip: "Absence non justifiée de l'enfant. Pas de déduction (salaire mensualisé, le parent paie quand même). Col. O pour régularisation.",
+    tooltip: "Absence non justifiée de l'enfant. Déduction sur le salaire (ligne 20). Col. O = heures contractuelles pour le calcul.",
     couleur: "orange",
-    categorie: "autre",
+    categorie: "absence",
     affecteColL: false,
     affecteColO: true,
     autoRemplirColO: true,
@@ -77,14 +77,14 @@ export const CODES: CodeJour[] = [
   {
     code: "CSS",
     label: "CSS",
-    tooltip: "Congé sans solde. Déduction sur le salaire mensualisé (ligne 21 Absence salarié). Heures contractuelles en col. O.",
+    tooltip: "Congé sans solde. Déduction sur le salaire mensualisé (ligne 21). Col. O vide : les heures de déduction sont calculées depuis le planning type en arrière-plan.",
     couleur: "amber",
-    categorie: "absence",
+    categorie: "conge",
     affecteColL: false,
-    affecteColO: true,
-    autoRemplirColO: true,
+    affecteColO: false,    // Pas de col. O visible dans le popup
+    autoRemplirColO: false,
     affecteColMN: false,
-    compteRegularisation: true,
+    compteRegularisation: false, // CSS ne compte PAS pour la régularisation
   },
   {
     code: "CPC",
