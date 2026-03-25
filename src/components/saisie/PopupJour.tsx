@@ -306,7 +306,7 @@ export default function PopupJour({
   return (
     <div
       className={`
-        fixed inset-0 z-50 flex items-end md:items-center justify-center
+        fixed inset-0 z-[60] flex items-end md:items-center justify-center
         transition-all duration-200
         ${isVisible ? "bg-black/40 backdrop-blur-sm" : "bg-transparent"}
       `}
@@ -315,7 +315,7 @@ export default function PopupJour({
       <div
         className={`
           bg-white rounded-t-3xl md:rounded-2xl w-full md:max-w-lg
-          max-h-[95vh] md:max-h-[90vh]
+          max-h-[100dvh] md:max-h-[90vh]
           flex flex-col
           shadow-2xl
           transition-transform duration-300 ease-out
@@ -636,7 +636,7 @@ export default function PopupJour({
         </div>
 
         {/* ===== Action buttons ===== */}
-        <div className="px-4 py-4 border-t border-gray-100 flex gap-3 bg-white rounded-b-2xl">
+        <div className="px-4 pt-3 pb-[calc(env(safe-area-inset-bottom,0px)+1rem)] border-t border-gray-100 flex gap-3 bg-white rounded-b-2xl">
           <button
             type="button"
             onClick={handleSave}
