@@ -254,9 +254,11 @@ export default function DashboardPage() {
               {enfants.map((enfant) => {
                 const md = allMoisData[enfant.id!];
                 const soldeInitial = enfant.cp_solde_initial || 0;
-                // Count conge days from jours data
+                // Count CP pris (CPC/CPI seulement — PAS CSS qui est sans solde)
                 const joursConge = md
-                  ? Object.values(md.jours).filter((j) => j.type === "conge").length
+                  ? Object.values(md.jours).filter((j) =>
+                      j.commentaire === "CPC" || j.commentaire === "CPI"
+                    ).length
                   : 0;
                 // Use MoisData CP fields
                 const cpAcquis = md ? (md.cp_n_jours_enfant || 0) : 0;
