@@ -12,6 +12,8 @@ import { CotisationsConfig } from "../constants/cotisations-2026";
 export interface BulletinInput {
   // Mensualisation
   mensualisation: MensualisationInput;
+  // Override heures mensualisées (prorata 1er mois)
+  heures_mensualisees_override?: number;
 
   // Rémunération
   taux_horaire: number;
@@ -52,10 +54,12 @@ export interface BulletinInput {
 export function calculerBulletinComplet(input: BulletinInput) {
   // 1. Mensualisation
   const mens = calculerMensualisation(input.mensualisation);
+  // Prorata du 1er mois si override fourni
+  const heuresMensu = input.heures_mensualisees_override ?? mens.heures_mensualisees;
 
   // 2. Rémunération
   const remuInput: RemunerationInput = {
-    heures_mensualisees: mens.heures_mensualisees,
+    heures_mensualisees: heuresMensu,
     heures_sup_mensualisees: mens.heures_sup_mensualisees,
     taux_horaire: input.taux_horaire,
     majoration_sup_mens: input.majoration_sup_mens,
