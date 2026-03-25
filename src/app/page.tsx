@@ -12,9 +12,11 @@ import {
   getMoisData,
   saveJourData,
   defaultMoisData,
+  getCPTableau,
   Enfant,
   UserData,
   MoisData,
+  CPMoisEntry,
 } from "@/lib/firestore";
 import {
   requestNotificationPermission,
@@ -34,6 +36,7 @@ export default function DashboardPage() {
   const [moisData, setMoisData] = useState<MoisData | null>(null);
   const [selectedEnfant, setSelectedEnfant] = useState<string>("");
   const [allMoisData, setAllMoisData] = useState<Record<string, MoisData>>({});
+  const [allCPData, setAllCPData] = useState<Record<string, CPMoisEntry[]>>({});
   const [cpExpanded, setCpExpanded] = useState(true);
 
   useEffect(() => {
@@ -80,6 +83,17 @@ export default function DashboardPage() {
         const map: Record<string, MoisData> = {};
         for (const [id, data] of results) map[id] = data;
         setAllMoisData(map);
+      });
+      // Charger les données CP depuis la collection cp de chaque enfant
+      Promise.all(
+        enfants.map(async (enf) => {
+          const cpData = await getCPTableau(user.uid, enf.id!);
+          return [enf.id!, cpData] as [string, CPMoisEntry[]];
+        })
+      ).then((results) => {
+        const map: Record<string, CPMoisEntry[]> = {};
+        for (const [id, data] of results) map[id] = data;
+        setAllCPData(map);
       });
     }
   }, [user, enfants]);
@@ -317,16 +331,38 @@ export default function DashboardPage() {
               >
                 <div className="grid gap-3 md:grid-cols-2">
                   {enfants.map((enfant) => {
-                    const md = allMoisData[enfant.id!];
                     const soldeInitial = enfant.cp_solde_initial || 0;
-                    const joursConge = md
+
+                    // CP data from Firestore collection
+                    const cpEntries = allCPData[enfant.id!] || [];
+                    const cpPrisFromCollection = cpEntries.reduce(
+                      (sum, e) => sum + (e.cpc_pris || 0) + (e.cpi_pris || 0), 0
+                    );
+
+                    // Fallback: count CPC/CPI from current month jours if collection empty
+                    const md = allMoisData[enfant.id!];
+                    const cpPrisFromJours = md
                       ? Object.values(md.jours).filter(
                           (j) => j.commentaire === "CPC" || j.commentaire === "CPI"
                         ).length
                       : 0;
-                    const cpAcquis = md ? md.cp_n_jours_enfant || 0 : 0;
-                    const cpPris = joursConge;
-                    const solde = soldeInitial + cpAcquis - cpPris;
+
+                    const cpPris = cpPrisFromCollection > 0 ? cpPrisFromCollection : cpPrisFromJours;
+
+                    // Auto-calc acquis: 2.5j × mois travaillés depuis embauche
+                    const embauche = enfant.date_embauche?.toDate?.()
+                      ? enfant.date_embauche.toDate()
+                      : null;
+                    const periodeDebut = moisCourant < 5
+                      ? new Date(anneeCourante - 1, 5, 1)
+                      : new Date(anneeCourante, 5, 1);
+                    const start = embauche && embauche > periodeDebut ? embauche : periodeDebut;
+                    const moisTrav = Math.max(0,
+                      (anneeCourante * 12 + moisCourant) - (start.getFullYear() * 12 + start.getMonth()) + 1
+                    );
+                    const cpAcquis = Math.min(Math.round(moisTrav * 2.5 * 100) / 100, 30);
+
+                    const solde = Math.round((soldeInitial + cpAcquis - cpPris) * 100) / 100;
                     const totalDispo = soldeInitial + cpAcquis;
                     const pctUsed =
                       totalDispo > 0 ? Math.min((cpPris / totalDispo) * 100, 100) : 0;
