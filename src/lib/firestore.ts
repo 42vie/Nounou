@@ -62,6 +62,97 @@ export interface Enfant {
   cp_solde_initial_date: string;   // Date de référence du solde initial (ex: "2026-01-01")
 }
 
+// Tableau CP mensuel — stocké dans une collection dédiée
+export interface CPMoisEntry {
+  annee: number;
+  mois: number; // 0-11
+  cpc_pris: number; // Jours CPc pris ce mois
+  cpi_pris: number; // Jours CPi pris ce mois
+  acquis: number;   // Jours acquis ce mois (auto-calculé)
+  manuel: boolean;  // true si modifié manuellement (pour les mois avant l'app)
+}
+
+export async function getCPTableau(
+  uid: string,
+  enfantId: string
+): Promise<CPMoisEntry[]> {
+  const snap = await getDocs(collection(db, "users", uid, "enfants", enfantId, "cp"));
+  return snap.docs.map((d) => d.data() as CPMoisEntry);
+}
+
+export async function saveCPMois(
+  uid: string,
+  enfantId: string,
+  annee: number,
+  mois: number,
+  data: Partial<CPMoisEntry>
+) {
+  const id = `${annee}_${String(mois).padStart(2, "0")}`;
+  await setDoc(
+    doc(db, "users", uid, "enfants", enfantId, "cp", id),
+    { ...data, annee, mois },
+    { merge: true }
+  );
+}
+
+// Poser des congés sur une période (du jour X au jour Y)
+// Remplit automatiquement les jours ouvrés en CPC ou CPI
+export async function poserCongesPeriode(
+  uid: string,
+  enfantId: string,
+  annee: number,
+  mois: number,
+  jourDebut: number,
+  jourFin: number,
+  code: "CPC" | "CPI",
+  planningType: Record<string, number>
+) {
+  const joursSemaine = ["dimanche", "lundi", "mardi", "mercredi", "jeudi", "vendredi", "samedi"];
+  const joursToSave: Record<string, JourData> = {};
+  let count = 0;
+
+  for (let j = jourDebut; j <= jourFin; j++) {
+    const date = new Date(annee, mois, j);
+    const dow = date.getDay();
+    // Skip week-ends
+    if (dow === 0 || dow === 6) continue;
+
+    const jourKey = joursSemaine[dow];
+    const heuresContrat = planningType[jourKey] || 0;
+    // Skip jours non travaillés selon le planning
+    if (heuresContrat === 0) continue;
+
+    const jourType: JourType = "conge";
+    joursToSave[String(j)] = {
+      type: jourType,
+      heures: 0,
+      heures_comp: 0,
+      heures_sup: 0,
+      heures_contrac: code === "CPC" ? heuresContrat : 0, // CPc = col.O, CPi = vide
+      repas: false,
+      commentaire: code,
+    };
+    count++;
+  }
+
+  // Sauvegarder tous les jours d'un coup
+  if (Object.keys(joursToSave).length > 0) {
+    const id = moisDocId(enfantId, annee, mois);
+    await setDoc(
+      doc(db, "users", uid, "mois", id),
+      { enfant_id: enfantId, annee, mois, jours: joursToSave },
+      { merge: true }
+    );
+  }
+
+  // Mettre à jour le tableau CP
+  await saveCPMois(uid, enfantId, annee, mois, {
+    [code === "CPC" ? "cpc_pris" : "cpi_pris"]: count,
+  } as Partial<CPMoisEntry>);
+
+  return count;
+}
+
 export type JourType =
   | "work"
   | "abs_enfant"

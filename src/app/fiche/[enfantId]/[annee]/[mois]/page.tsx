@@ -170,6 +170,18 @@ export default function FichePage() {
     annee, moisIdx, moisData.jours || {}
   );
 
+  // ===== AUTO-CALCUL CONGÉS PAYÉS =====
+  const cpNDebut = moisIdx < 5 ? new Date(annee - 1, 5, 1) : new Date(annee, 5, 1);
+  const embauche = enfant.date_embauche?.toDate?.() ? enfant.date_embauche.toDate() : new Date(2020, 0, 1);
+  const cpNStart = embauche > cpNDebut ? embauche : cpNDebut;
+  const cpNMoisTrav = Math.max(0, (annee * 12 + moisIdx) - (cpNStart.getFullYear() * 12 + cpNStart.getMonth()) + 1);
+  const cpNSemTrav = Math.round(cpNMoisTrav * (enfant.semaines_programmees / 12));
+  let cpNPris = 0;
+  Object.values(moisData.jours || {}).forEach((j) => {
+    if (j.commentaire === "CPC" || j.commentaire === "CPI") cpNPris++;
+  });
+  const cpSoldeInitial = enfant.cp_solde_initial || 0;
+
   // Calcul complet
   const bulletin = calculerBulletinComplet({
     mensualisation: {
@@ -218,10 +230,10 @@ export default function FichePage() {
       ])
     ),
     conges_n: {
-      mois_travailles: moisData.cp_n_mois_travailles || 0,
-      semaines_travaillees: moisData.cp_n_semaines_travaillees || 0,
+      mois_travailles: cpNMoisTrav,
+      semaines_travaillees: cpNSemTrav,
       jours_enfant: moisData.cp_n_jours_enfant || 0,
-      jours_pris: moisData.cp_n_jours_pris || 0,
+      jours_pris: cpNPris,
     },
     conges_n1: {
       mois_travailles: moisData.cp_n1_mois_travailles || 0,
@@ -241,7 +253,6 @@ export default function FichePage() {
 
   const nbJoursMois = getDaysInMonth(annee, moisIdx);
 
-  // Période CP
   const cpNPeriode = moisIdx < 5
     ? `01/06/${annee - 1} au 31/05/${annee}`
     : `01/06/${annee} au 31/05/${annee + 1}`;
@@ -367,12 +378,12 @@ export default function FichePage() {
         cumul_ie_in_ik={cumulData.ieInIk}
         conges_n={{
           periode: cpNPeriode,
-          mois_trav: moisData.cp_n_mois_travailles || 0,
-          sem_trav: moisData.cp_n_semaines_travaillees || 0,
+          mois_trav: cpNMoisTrav,
+          sem_trav: cpNSemTrav,
           jours_enfant: moisData.cp_n_jours_enfant || 0,
-          jours_acquis: bulletin.conges_n.jours_acquis,
-          jours_pris: moisData.cp_n_jours_pris || 0,
-          solde: bulletin.conges_n.solde,
+          jours_acquis: bulletin.conges_n.jours_acquis + cpSoldeInitial,
+          jours_pris: cpNPris,
+          solde: bulletin.conges_n.jours_acquis + cpSoldeInitial - cpNPris,
         }}
         conges_n1={{
           periode: cpN1Periode,
