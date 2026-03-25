@@ -238,7 +238,7 @@ export default function FichePage() {
     majoration_comp: moisData.majoration_comp || 0,
     heures_sup_base: autoHeuresSup || moisData.heures_sup_base || 0,
     majoration_sup: moisData.majoration_sup ?? 0.25,
-    absence_enfant_heures: absences.heures_abs_enfant,
+    absence_enfant_heures: 0, // ANJE ne déduit pas et n'affiche pas d'heures
     absence_salarie_heures: absences.heures_abs_salarie,
     taux_deduction_absence_enfant: taux,
     taux_deduction_absence_salarie: taux,
@@ -392,7 +392,7 @@ export default function FichePage() {
         majoration_sup={moisData.majoration_sup ?? 0.25}
         heures_comp_base={autoHeuresComp || moisData.heures_comp_base || 0}
         heures_sup_base={autoHeuresSup || moisData.heures_sup_base || 0}
-        absence_enfant_heures={absences.heures_abs_enfant}
+        absence_enfant_heures={0}
         absence_salarie_heures={absences.heures_abs_salarie}
         taux_deduction_enfant={taux}
         taux_deduction_salarie={taux}
