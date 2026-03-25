@@ -241,22 +241,35 @@ export default function PopupJour({
     onSave(jour, enfant.id, data);
   }, [enfant, selectedCode, heures, heuresComp, heuresSup, heuresContrac, repas, jour, onSave, colLActive, colOActive, colMNActive]);
 
-  // Save and go next
+  // Save and go to next weekday
   const handleSaveAndNext = useCallback(() => {
     handleSave();
-    if (jour < nbJours) {
-      onChangeJour(jour + 1);
+    let d = jour + 1;
+    while (d <= nbJours) {
+      const dow = new Date(annee, mois, d).getDay();
+      if (dow !== 0 && dow !== 6) { onChangeJour(d); return; }
+      d++;
     }
-  }, [handleSave, jour, nbJours, onChangeJour]);
+  }, [handleSave, jour, nbJours, annee, mois, onChangeJour]);
 
-  // Navigate days
+  // Navigate days — skip weekends
   const goToPrevDay = useCallback(() => {
-    if (jour > 1) onChangeJour(jour - 1);
-  }, [jour, onChangeJour]);
+    let d = jour - 1;
+    while (d >= 1) {
+      const dow = new Date(annee, mois, d).getDay();
+      if (dow !== 0 && dow !== 6) { onChangeJour(d); return; }
+      d--;
+    }
+  }, [jour, annee, mois, onChangeJour]);
 
   const goToNextDay = useCallback(() => {
-    if (jour < nbJours) onChangeJour(jour + 1);
-  }, [jour, nbJours, onChangeJour]);
+    let d = jour + 1;
+    while (d <= nbJours) {
+      const dow = new Date(annee, mois, d).getDay();
+      if (dow !== 0 && dow !== 6) { onChangeJour(d); return; }
+      d++;
+    }
+  }, [jour, nbJours, annee, mois, onChangeJour]);
 
   // Close with animation
   const handleClose = useCallback(() => {

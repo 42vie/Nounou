@@ -57,6 +57,9 @@ export interface Enfant {
     samedi: number;
   };
   methode_absence: "heures" | "jours" | "minoration_cassation";
+  jours_pajemploi_contrat: number; // Nb jours à déclarer à Pajemploi (variable du contrat)
+  cp_solde_initial: number;        // Solde CP au démarrage (ex: 10 jours au 1er janvier 2026)
+  cp_solde_initial_date: string;   // Date de référence du solde initial (ex: "2026-01-01")
 }
 
 export type JourType =

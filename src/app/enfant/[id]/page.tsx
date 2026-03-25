@@ -54,6 +54,9 @@ export default function EnfantPage() {
             planning_vendredi: e.planning_type?.vendredi || 0,
             planning_samedi: e.planning_type?.samedi || 0,
             methode_absence: e.methode_absence,
+            jours_pajemploi_contrat: e.jours_pajemploi_contrat || 0,
+            cp_solde_initial: e.cp_solde_initial || 0,
+            cp_solde_initial_date: e.cp_solde_initial_date || "",
           });
         }
       });
@@ -100,6 +103,9 @@ export default function EnfantPage() {
         samedi: form.planning_samedi as number,
       },
       methode_absence: form.methode_absence as Enfant["methode_absence"],
+      jours_pajemploi_contrat: form.jours_pajemploi_contrat as number,
+      cp_solde_initial: form.cp_solde_initial as number,
+      cp_solde_initial_date: form.cp_solde_initial_date as string,
     };
 
     await saveEnfant(user.uid, id, data);

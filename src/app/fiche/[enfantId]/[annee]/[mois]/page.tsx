@@ -18,6 +18,8 @@ import {
 import { MOIS_NOMS, getDaysInMonth } from "@/lib/utils";
 import { calculerBulletinComplet } from "@/lib/calculs/fiche-complete";
 import { COTISATIONS_2026 } from "@/lib/constants/cotisations-2026";
+import { calculerAbsencesMois } from "@/lib/calculs/absences";
+import { calculerMensualisation } from "@/lib/calculs/mensualisation";
 import { BulletinComplet } from "@/components/bulletin/BulletinComplet";
 
 export default function FichePage() {
@@ -133,8 +135,33 @@ export default function FichePage() {
     return <div className="p-8 text-center text-gray-400">Chargement du bulletin...</div>;
   }
 
-  // Calcul complet
+  // Auto-calculer IE nombre = jours effectivement travaillés
+  const joursEffectifsTravailles = Object.values(moisData.jours || {}).filter(
+    (j) => j.type === "work" || (j.commentaire === "WORK" && j.heures > 0)
+  ).length;
+
+  // Auto-calculer absences depuis les jours saisis
   const taux = moisData.taux_horaire_mois || enfant.taux_horaire;
+  const mens = calculerMensualisation({
+    type_contrat: enfant.type_contrat,
+    annee_complete: enfant.annee_complete,
+    semaines_programmees: enfant.semaines_programmees,
+    heures_normales_semaine: enfant.heures_normales_semaine,
+    heures_sup_semaine: enfant.heures_sup_semaine,
+    mois_prevus: enfant.mois_prevus,
+  });
+  const salaireMensualise = mens.heures_mensualisees * taux;
+  const absences = calculerAbsencesMois(
+    {
+      annee_complete: enfant.annee_complete,
+      salaire_mensualise: salaireMensualise,
+      taux_horaire: taux,
+      planning_type: enfant.planning_type || {},
+    },
+    annee, moisIdx, moisData.jours || {}
+  );
+
+  // Calcul complet
   const bulletin = calculerBulletinComplet({
     mensualisation: {
       type_contrat: enfant.type_contrat,
@@ -150,8 +177,8 @@ export default function FichePage() {
     majoration_comp: moisData.majoration_comp || 0,
     heures_sup_base: moisData.heures_sup_base || 0,
     majoration_sup: moisData.majoration_sup ?? 0.25,
-    absence_enfant_heures: moisData.absence_enfant_heures || 0,
-    absence_salarie_heures: moisData.absence_salarie_heures || 0,
+    absence_enfant_heures: absences.heures_abs_enfant,
+    absence_salarie_heures: absences.heures_abs_salarie,
     taux_deduction_absence_enfant: taux,
     taux_deduction_absence_salarie: taux,
     indemnite_cp: moisData.indemnite_cp || 0,
@@ -162,7 +189,7 @@ export default function FichePage() {
     cotisations_config: COTISATIONS_2026,
     indemnites: {
       ie_base: moisData.ie_base || 0,
-      ie_nombre: moisData.ie_nombre || 0,
+      ie_nombre: joursEffectifsTravailles,
       ie_comp_base: moisData.ie_comp_base || 0,
       ie_comp_nombre: moisData.ie_comp_nombre || 0,
       repas_base: moisData.repas_base || 0,
@@ -298,7 +325,7 @@ export default function FichePage() {
         salaire_net_social={bulletin.net.salaire_net_social}
         indemnites={{
           ie_base: moisData.ie_base || 0,
-          ie_nombre: moisData.ie_nombre || 0,
+          ie_nombre: joursEffectifsTravailles,
           g52: bulletin.indemnites.g52,
           ie_comp_base: moisData.ie_comp_base || 0,
           ie_comp_nombre: moisData.ie_comp_nombre || 0,
