@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 60" fill="none">
+  <!-- Placeholder - remplacer par logo-proassmat.png -->
+  <!-- UNS circle -->
+  <circle cx="25" cy="30" r="20" fill="#E91E63"/>
+  <circle cx="25" cy="30" r="16" fill="white"/>
+  <circle cx="25" cy="30" r="13" fill="#E91E63"/>
+  <text x="25" y="35" text-anchor="middle" font-family="Arial" font-weight="bold" font-size="11" fill="white">UN</text>
+  <!-- Dots decoration -->
+  <circle cx="8" cy="12" r="3" fill="#E91E63"/>
+  <circle cx="16" cy="8" r="3" fill="#1A237E"/>
+  <circle cx="25" cy="6" r="3" fill="#E91E63"/>
+  <circle cx="34" cy="8" r="3" fill="#1A237E"/>
+  <circle cx="42" cy="12" r="3" fill="#E91E63"/>
+  <!-- PRO ASSMAT -->
+  <text x="55" y="28" font-family="Arial" font-weight="bold" font-size="22" fill="#1A237E">PRO</text>
+  <text x="100" y="28" font-family="Arial" font-weight="900" font-size="22" fill="#E91E63">ASS</text>
+  <text x="145" y="28" font-family="Arial" font-weight="900" font-size="22" fill="#E91E63">MAT</text>
+  <!-- & ASSFAM -->
+  <text x="55" y="48" font-family="Arial" font-weight="bold" font-size="16" fill="#1A237E">&amp; ASSFAM</text>
+  <!-- Tagline -->
+  <text x="170" y="48" font-family="Arial" font-size="8" fill="#1A237E">UN SYNDICAT QUI VOUS RASSEMBLE</text>
+</svg>

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { signIn, signUp } from "@/lib/auth";
 
@@ -35,9 +36,13 @@ export default function LoginPage() {
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-50 to-purple-100 p-4">
       <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-8">
         <div className="text-center mb-8">
-          <div className="w-16 h-16 bg-purple-600 rounded-2xl flex items-center justify-center text-white font-bold text-2xl mx-auto mb-4">
-            AP
-          </div>
+          <Image
+            src="/logo-assmatpaie.svg"
+            alt="AssMatPaie"
+            width={80}
+            height={80}
+            className="mx-auto mb-4 rounded-2xl"
+          />
           <h1 className="text-2xl font-bold text-gray-900">AssMatPaie</h1>
           <p className="text-sm text-gray-500 mt-1">
             Bulletins de paie assistante maternelle
