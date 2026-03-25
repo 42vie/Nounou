@@ -463,7 +463,16 @@ export default function PopupJour({
                     min="0"
                     max="24"
                     value={heures}
-                    onChange={(e) => setHeures(parseFloat(e.target.value) || 0)}
+                    onChange={(e) => {
+                      const val = parseFloat(e.target.value) || 0;
+                      setHeures(val);
+                      // Auto-calc H. complémentaires si heures > planning
+                      if (selectedCode === "WORK" && val > planningHours && planningHours > 0) {
+                        setHeuresComp(Math.round((val - planningHours) * 100) / 100);
+                      } else if (selectedCode === "WORK") {
+                        setHeuresComp(0);
+                      }
+                    }}
                     className="
                       w-full border-2 border-gray-200 rounded-xl p-3 text-base font-semibold
                       bg-white focus:border-purple-400 focus:ring-2 focus:ring-purple-100

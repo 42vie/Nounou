@@ -135,10 +135,19 @@ export default function FichePage() {
     return <div className="p-8 text-center text-gray-400">Chargement du bulletin...</div>;
   }
 
-  // Auto-calculer IE nombre = jours effectivement travaillés
-  const joursEffectifsTravailles = Object.values(moisData.jours || {}).filter(
+  // Auto-calculer depuis les jours saisis
+  const joursArray = Object.values(moisData.jours || {});
+  const joursEffectifsTravailles = joursArray.filter(
     (j) => j.type === "work" || (j.commentaire === "WORK" && j.heures > 0)
   ).length;
+
+  // Auto-sommer heures complémentaires et supplémentaires depuis col. M et N
+  let autoHeuresComp = 0;
+  let autoHeuresSup = 0;
+  joursArray.forEach((j) => {
+    autoHeuresComp += j.heures_comp || 0;
+    autoHeuresSup += j.heures_sup || 0;
+  });
 
   // Auto-calculer absences depuis les jours saisis
   const taux = moisData.taux_horaire_mois || enfant.taux_horaire;
@@ -173,9 +182,9 @@ export default function FichePage() {
     },
     taux_horaire: taux,
     majoration_sup_mens: moisData.majoration_sup_mens ?? 0.25,
-    heures_comp_base: moisData.heures_comp_base || 0,
+    heures_comp_base: autoHeuresComp || moisData.heures_comp_base || 0,
     majoration_comp: moisData.majoration_comp || 0,
-    heures_sup_base: moisData.heures_sup_base || 0,
+    heures_sup_base: autoHeuresSup || moisData.heures_sup_base || 0,
     majoration_sup: moisData.majoration_sup ?? 0.25,
     absence_enfant_heures: absences.heures_abs_enfant,
     absence_salarie_heures: absences.heures_abs_salarie,
@@ -300,8 +309,8 @@ export default function FichePage() {
         majoration_sup_mens={moisData.majoration_sup_mens ?? 0.25}
         majoration_comp={moisData.majoration_comp || 0}
         majoration_sup={moisData.majoration_sup ?? 0.25}
-        heures_comp_base={moisData.heures_comp_base || 0}
-        heures_sup_base={moisData.heures_sup_base || 0}
+        heures_comp_base={autoHeuresComp || moisData.heures_comp_base || 0}
+        heures_sup_base={autoHeuresSup || moisData.heures_sup_base || 0}
         absence_enfant_heures={absences.heures_abs_enfant}
         absence_salarie_heures={absences.heures_abs_salarie}
         taux_deduction_enfant={taux}
