@@ -4,12 +4,13 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useAuth } from "@/lib/auth-context";
+import { Home, CalendarDays, BarChart3, Settings } from "lucide-react";
 
 const navItems = [
-  { href: "/", label: "Accueil", icon: "🏠" },
-  { href: "/mois", label: "Saisie", icon: "📅" },
-  { href: "/recapitulatif", label: "Récap", icon: "📊" },
-  { href: "/parametres", label: "Paramètres", icon: "⚙️" },
+  { href: "/", label: "Accueil", icon: Home },
+  { href: "/mois", label: "Saisie", icon: CalendarDays },
+  { href: "/recapitulatif", label: "Récap", icon: BarChart3 },
+  { href: "/parametres", label: "Paramètres", icon: Settings },
 ];
 
 export function Navigation() {
@@ -19,61 +20,75 @@ export function Navigation() {
   if (!user) return null;
 
   return (
-    <>
-      {/* Sidebar desktop */}
-      <aside className="hidden md:flex md:flex-col md:w-56 md:fixed md:inset-y-0 bg-white border-r border-gray-200 shadow-sm">
-        <div className="p-4 border-b">
-          <Link href="/" className="flex items-center gap-2">
-            <Image
-              src="/logo-assmatpaie.png"
-              alt="AssMatPaie"
-              width={40}
-              height={40}
-              className="rounded-lg"
-            />
-            <span className="font-bold text-purple-900">AssMatPaie</span>
-          </Link>
-        </div>
-        <nav className="flex-1 p-3 space-y-1">
-          {navItems.map((item) => (
+    <nav className="fixed bottom-0 inset-x-0 z-50 backdrop-blur-xl bg-white/70 border-t border-white/20 shadow-[0_-2px_10px_rgba(0,0,0,0.08)]">
+      <div className="flex items-center justify-around h-[60px] max-w-2xl mx-auto px-2">
+        {navItems.slice(0, 2).map((item) => {
+          const Icon = item.icon;
+          const isActive = pathname === item.href;
+          return (
             <Link
               key={item.href}
               href={item.href}
-              className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors ${
-                pathname === item.href
-                  ? "bg-purple-100 text-purple-900 font-medium"
-                  : "text-gray-600 hover:bg-gray-100"
+              className={`flex flex-col items-center gap-0.5 px-3 py-1 rounded-xl transition-colors ${
+                isActive
+                  ? "text-purple-700"
+                  : "text-gray-500 hover:text-gray-700"
               }`}
             >
-              <span>{item.icon}</span>
-              <span>{item.label}</span>
+              <div
+                className={`p-1 rounded-lg ${
+                  isActive ? "bg-purple-100" : ""
+                }`}
+              >
+                <Icon size={22} strokeWidth={isActive ? 2.5 : 2} />
+              </div>
+              <span className="text-[10px] font-medium">{item.label}</span>
             </Link>
-          ))}
-        </nav>
-        <div className="p-3 border-t text-xs text-gray-400">
-          PROASSMAT&ASSFAM
-        </div>
-      </aside>
+          );
+        })}
 
-      {/* Bottom nav mobile */}
-      <nav className="md:hidden fixed bottom-0 inset-x-0 bg-white border-t border-gray-200 z-50">
-        <div className="flex justify-around">
-          {navItems.map((item) => (
+        {/* Logo center */}
+        <Link
+          href="/"
+          className="flex flex-col items-center gap-0.5 px-3 py-1"
+        >
+          <Image
+            src="/logo-assmatpaie.png"
+            alt="AssMatPaie"
+            width={30}
+            height={30}
+            className="rounded-lg"
+          />
+          <span className="text-[9px] font-semibold text-purple-900">
+            AssMatPaie
+          </span>
+        </Link>
+
+        {navItems.slice(2).map((item) => {
+          const Icon = item.icon;
+          const isActive = pathname === item.href;
+          return (
             <Link
               key={item.href}
               href={item.href}
-              className={`flex flex-col items-center py-2 px-3 text-xs ${
-                pathname === item.href
-                  ? "text-purple-700 font-medium"
-                  : "text-gray-500"
+              className={`flex flex-col items-center gap-0.5 px-3 py-1 rounded-xl transition-colors ${
+                isActive
+                  ? "text-purple-700"
+                  : "text-gray-500 hover:text-gray-700"
               }`}
             >
-              <span className="text-lg">{item.icon}</span>
-              <span>{item.label}</span>
+              <div
+                className={`p-1 rounded-lg ${
+                  isActive ? "bg-purple-100" : ""
+                }`}
+              >
+                <Icon size={22} strokeWidth={isActive ? 2.5 : 2} />
+              </div>
+              <span className="text-[10px] font-medium">{item.label}</span>
             </Link>
-          ))}
-        </div>
-      </nav>
-    </>
+          );
+        })}
+      </div>
+    </nav>
   );
 }

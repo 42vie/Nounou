@@ -19,12 +19,10 @@ export default function RootLayout({
     <html lang="fr">
       <body className="min-h-screen bg-gray-50 antialiased">
         <AuthProvider>
-          <div className="flex flex-col min-h-screen md:flex-row">
-            <Navigation />
-            <main className="flex-1 pb-20 md:pb-0 md:ml-56">
-              <div className="max-w-7xl mx-auto p-4">{children}</div>
-            </main>
-          </div>
+          <main className="pb-20">
+            <div className="max-w-7xl mx-auto p-4">{children}</div>
+          </main>
+          <Navigation />
           <NotificationChecker />
         </AuthProvider>
       </body>
