@@ -636,7 +636,43 @@ export default function PopupJour({
         </div>
 
         {/* ===== Action buttons ===== */}
-        <div className="px-4 py-4 border-t border-gray-100 flex gap-3 bg-white rounded-b-2xl">
+        <div className="px-4 py-4 border-t border-gray-100 space-y-2 bg-white rounded-b-2xl">
+          {/* Effacer le jour */}
+          {joursData[String(jour)] && (
+            <button
+              type="button"
+              onClick={() => {
+                // Enregistrer un jour vide pour effacer
+                if (!enfant) return;
+                const emptyData: JourData = {
+                  type: "repos",
+                  heures: 0,
+                  heures_comp: 0,
+                  heures_sup: 0,
+                  heures_contrac: 0,
+                  repas: false,
+                  commentaire: "",
+                };
+                onSave(jour, enfant.id, emptyData);
+                setSelectedCode("WORK");
+                setHeures(planningHours);
+                setHeuresContrac(0);
+                setHeuresComp(0);
+                setHeuresSup(0);
+                setRepas(false);
+                showToast(`Jour ${jour} effacé`, "info");
+              }}
+              className="
+                w-full py-2 px-4 rounded-xl text-xs font-medium
+                border border-red-200 text-red-600
+                hover:bg-red-50 active:bg-red-100
+                transition-colors min-h-[36px]
+              "
+            >
+              Effacer ce jour
+            </button>
+          )}
+          <div className="flex gap-3">
           <button
             type="button"
             onClick={handleSave}
@@ -669,6 +705,7 @@ export default function PopupJour({
               <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
             </svg>
           </button>
+          </div>
         </div>
       </div>
     </div>
