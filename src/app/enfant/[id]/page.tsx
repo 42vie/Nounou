@@ -333,6 +333,43 @@ export default function EnfantPage() {
                 </div>
               ))}
             </div>
+
+            {/* Toggle paire/impaire */}
+            <div className="flex items-center gap-3 pt-2">
+              <input
+                type="checkbox"
+                id="edit_planning_alterne"
+                checked={form.planning_alterne as boolean}
+                onChange={(e) => update("planning_alterne", e.target.checked)}
+                className="w-4 h-4"
+              />
+              <label htmlFor="edit_planning_alterne" className="text-sm">
+                Planning alterné (semaine paire / impaire)
+              </label>
+            </div>
+
+            {/* Planning semaine impaire */}
+            {form.planning_alterne && (
+              <div>
+                <h3 className="text-xs font-bold text-purple-700 mb-2 mt-2">
+                  Semaine impaire (le planning ci-dessus = semaine paire)
+                </h3>
+                <div className="grid grid-cols-3 gap-3">
+                  {["lundi", "mardi", "mercredi", "jeudi", "vendredi", "samedi"].map((j) => (
+                    <div key={`imp_${j}`}>
+                      <label className="block text-xs font-medium text-gray-600 mb-1 capitalize">{j}</label>
+                      <input
+                        type="number"
+                        step="0.25"
+                        value={form[`planning_imp_${j}`] as number || ""}
+                        onChange={(e) => update(`planning_imp_${j}`, parseFloat(e.target.value) || 0)}
+                        className="w-full border rounded-lg p-2 text-sm bg-purple-50"
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </section>
 
           {/* Méthode absence */}
