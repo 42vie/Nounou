@@ -222,6 +222,8 @@ export default function FichePage() {
       heures_sup_semaine: enfant.heures_sup_semaine,
       mois_prevus: enfant.mois_prevus,
     },
+    // Prorata du 1er mois si embauche en cours de mois
+    heures_mensualisees_override: isPremierMois ? heuresMensuProrata : undefined,
     taux_horaire: taux,
     majoration_sup_mens: moisData.majoration_sup_mens ?? 0.25,
     heures_comp_base: autoHeuresComp || moisData.heures_comp_base || 0,
@@ -348,7 +350,7 @@ export default function FichePage() {
         semaines_prog={enfant.semaines_programmees}
         heures_norm_sem={enfant.heures_normales_semaine}
         heures_sup_sem={enfant.heures_sup_semaine}
-        heures_mensualisees={bulletin.mensualisation.heures_mensualisees}
+        heures_mensualisees={isPremierMois ? heuresMensuProrata : bulletin.mensualisation.heures_mensualisees}
         heures_sup_mensualisees={bulletin.mensualisation.heures_sup_mensualisees}
         remuneration={bulletin.remuneration}
         taux_horaire={taux}
