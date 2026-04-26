@@ -111,6 +111,18 @@ export const CODES: CodeJour[] = [
     compteRegularisation: false,
   },
   {
+    code: "SED",
+    label: "SED",
+    tooltip: "Suspension de l'exécution du contrat. Les heures contractuelles en col. O comptent pour la régularisation.",
+    couleur: "violet",
+    categorie: "conge",
+    affecteColL: false,
+    affecteColO: true,
+    autoRemplirColO: true,
+    affecteColMN: false,
+    compteRegularisation: true,
+  },
+  {
     code: "CEF",
     label: "CEF",
     tooltip: "Congé exceptionnel familial (mariage, décès, naissance...). Mettre les heures contractuelles en col. O.",
