@@ -59,6 +59,7 @@ function codeToJourType(code: string): JourType {
     case "CSS":
     case "CPC":
     case "CPI":
+    case "SED":
       return "conge";
     case "FERIE":
     case "FCP":
