@@ -249,6 +249,25 @@ export default function PopupJour({
   // Save handler
   const handleSave = useCallback(() => {
     if (!enfant) return;
+
+    // WORK sans aucune heure → on efface le jour plutôt que d'écrire "WORK" avec 0h
+    if (selectedCode === "WORK" && heures === 0 && heuresComp === 0 && heuresSup === 0) {
+      const emptyData: JourData = {
+        type: "repos",
+        heures: 0,
+        heures_comp: 0,
+        heures_sup: 0,
+        heures_contrac: 0,
+        repas: false,
+        commentaire: "",
+        abs_salarie_h: 0,
+        abs_enfant_h: 0,
+      };
+      onSave(jour, enfant.id, emptyData);
+      showToast(`Jour ${jour} enregistré`);
+      return;
+    }
+
     const data: JourData = {
       type: codeToJourType(selectedCode),
       heures: colLActive ? heures : 0,
