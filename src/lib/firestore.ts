@@ -178,6 +178,8 @@ export interface JourData {
   heures_contrac: number;
   repas: boolean;
   commentaire: string;
+  abs_salarie_h?: number; // Heures d'absence partielle salarié (déduites du salaire)
+  abs_enfant_h?: number;  // Heures d'absence partielle enfant (non déduites)
 }
 
 export interface MoisData {
