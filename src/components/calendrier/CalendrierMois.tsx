@@ -145,7 +145,10 @@ export function CalendrierMois({
                 today.getFullYear() === annee &&
                 today.getMonth() === mois &&
                 today.getDate() === jour;
-              const isSaisi = !!jourData;
+              // WORK avec 0h = entrée vide parasite → on l'ignore visuellement
+              const isSaisi = !!jourData &&
+                !(jourData.commentaire === "WORK" && jourData.heures === 0 && !jourData.heures_comp && !jourData.heures_sup) &&
+                jourData.commentaire !== "";
 
               let cellClass =
                 "border rounded-lg p-1.5 text-center transition-colors cursor-pointer min-h-[48px] ";
