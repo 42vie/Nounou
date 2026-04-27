@@ -32,6 +32,8 @@ export default function RecapMois({ enfantNom, annee, mois, joursData }: RecapMo
     let countCSS = 0;
     let countCP = 0;
     let countRepas = 0;
+    let totalAbsSalarieH = 0;
+    let totalAbsEnfantH = 0;
     let joursTravailles = 0;
     let countFeries = 0;
     let countAbsences = 0;
@@ -44,6 +46,8 @@ export default function RecapMois({ enfantNom, annee, mois, joursData }: RecapMo
       totalHeuresContrac += data.heures_contrac || 0;
 
       if (data.repas) countRepas++;
+      totalAbsSalarieH += data.abs_salarie_h || 0;
+      totalAbsEnfantH += data.abs_enfant_h || 0;
 
       // Code stored in commentaire field
       const code = data.commentaire || "";
@@ -79,6 +83,8 @@ export default function RecapMois({ enfantNom, annee, mois, joursData }: RecapMo
       joursTravailles,
       countFeries,
       countAbsences,
+      totalAbsSalarieH,
+      totalAbsEnfantH,
     };
   }, [joursData, annee, mois]);
 
@@ -142,6 +148,22 @@ export default function RecapMois({ enfantNom, annee, mois, joursData }: RecapMo
           )}
           {recap.totalHeuresContrac > 0 && (
             <span>{recap.totalHeuresContrac.toFixed(2)}h contrac. (O)</span>
+          )}
+        </div>
+      )}
+
+      {/* Absences partielles */}
+      {(recap.totalAbsSalarieH > 0 || recap.totalAbsEnfantH > 0) && (
+        <div className="flex flex-wrap gap-x-3 gap-y-1 text-xs pt-1 border-t border-purple-100">
+          {recap.totalAbsSalarieH > 0 && (
+            <span className="text-red-600 font-medium">
+              {recap.totalAbsSalarieH.toFixed(2)}h abs. salarié (déduit)
+            </span>
+          )}
+          {recap.totalAbsEnfantH > 0 && (
+            <span className="text-orange-600 font-medium">
+              {recap.totalAbsEnfantH.toFixed(2)}h abs. enfant
+            </span>
           )}
         </div>
       )}

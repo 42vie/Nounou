@@ -59,8 +59,9 @@ function codeToJourType(code: string): JourType {
     case "CSS":
     case "CPC":
     case "CPI":
-    case "SED":
       return "conge";
+    case "SED":
+      return "repos";
     case "FERIE":
     case "FCP":
       return "ferie_travaille";
@@ -143,6 +144,8 @@ export default function PopupJour({
   const [heuresSup, setHeuresSup] = useState<number>(existingData?.heures_sup ?? 0);
   const [repas, setRepas] = useState<boolean>(existingData?.repas ?? (initialCode === "WORK" && planningHours > 0));
   const [km, setKm] = useState<number>(0);
+  const [absSalarieH, setAbsSalarieH] = useState<number>(existingData?.abs_salarie_h ?? 0);
+  const [absEnfantH, setAbsEnfantH] = useState<number>(existingData?.abs_enfant_h ?? 0);
 
   // Animation state
   const [isVisible, setIsVisible] = useState(false);
@@ -174,6 +177,8 @@ export default function PopupJour({
       setHeuresComp(data.heures_comp ?? 0);
       setHeuresSup(data.heures_sup ?? 0);
       setRepas(data.repas ?? false);
+      setAbsSalarieH(data.abs_salarie_h ?? 0);
+      setAbsEnfantH(data.abs_enfant_h ?? 0);
     } else {
       const code = newNomFerie ? "FERIE" : "WORK";
       setSelectedCode(code);
@@ -183,6 +188,8 @@ export default function PopupJour({
       setHeuresComp(0);
       setHeuresSup(0);
       setRepas(code === "WORK" && newPlanningHours > 0);
+      setAbsSalarieH(0);
+      setAbsEnfantH(0);
     }
     setKm(0);
 
@@ -205,19 +212,25 @@ export default function PopupJour({
         setHeuresComp(0);
         setHeuresSup(0);
         setRepas(ph > 0);
+        setAbsSalarieH(0);
+        setAbsEnfantH(0);
       } else if (codeObj.code === "CSS" || codeObj.code === "CPI") {
         setHeures(0);
         setHeuresContrac(0);
         setHeuresComp(0);
         setHeuresSup(0);
         setRepas(false);
+        setAbsSalarieH(0);
+        setAbsEnfantH(0);
       } else {
-        // FERIE, FCP, ANJE, ABS, CPC, CEF, FRAC, FO, DIV
+        // FERIE, FCP, ANJE, ABS, CPC, SED, CEF, FRAC, FO, DIV
         setHeures(0);
         setHeuresContrac(codeObj.autoRemplirColO ? ph : 0);
         setHeuresComp(0);
         setHeuresSup(0);
         setRepas(false);
+        setAbsSalarieH(0);
+        setAbsEnfantH(0);
       }
     },
     [annee, mois, jour, enfant]
@@ -227,6 +240,11 @@ export default function PopupJour({
   const colLActive = currentCodeObj?.affecteColL ?? false;
   const colOActive = currentCodeObj?.affecteColO ?? false;
   const colMNActive = currentCodeObj?.affecteColMN ?? false;
+
+  // Gap between planning hours and actual hours entered (for partial absence suggestions)
+  const gap = selectedCode === "WORK" && planningHours > 0
+    ? Math.max(0, Math.round((planningHours - heures) * 100) / 100)
+    : 0;
 
   // Save handler
   const handleSave = useCallback(() => {
@@ -239,10 +257,12 @@ export default function PopupJour({
       heures_contrac: colOActive ? heuresContrac : 0,
       repas,
       commentaire: selectedCode,
+      abs_salarie_h: selectedCode === "WORK" ? absSalarieH : 0,
+      abs_enfant_h: selectedCode === "WORK" ? absEnfantH : 0,
     };
     onSave(jour, enfant.id, data);
     showToast(`Jour ${jour} enregistré`);
-  }, [enfant, selectedCode, heures, heuresComp, heuresSup, heuresContrac, repas, jour, onSave, colLActive, colOActive, colMNActive]);
+  }, [enfant, selectedCode, heures, heuresComp, heuresSup, heuresContrac, repas, jour, onSave, colLActive, colOActive, colMNActive, absSalarieH, absEnfantH]);
 
   // Save and go to next weekday
   const handleSaveAndNext = useCallback(() => {
@@ -592,6 +612,72 @@ export default function PopupJour({
               </div>
             </div>
           </div>
+
+          {/* ===== Absences partielles (WORK uniquement) ===== */}
+          {selectedCode === "WORK" && planningHours > 0 && (
+            <div className="space-y-2">
+              <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                Absences partielles
+              </label>
+
+              {/* Boutons de remplissage rapide quand il y a un écart */}
+              {gap > 0 && (
+                <div className="flex gap-2">
+                  <button
+                    type="button"
+                    onClick={() => { setAbsSalarieH(gap); setAbsEnfantH(0); }}
+                    className="flex-1 py-2 px-3 rounded-xl text-xs font-semibold border-2 border-red-200 text-red-700 bg-red-50 hover:bg-red-100 active:bg-red-200 transition-colors min-h-[44px]"
+                  >
+                    {gap}h abs. salarié
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => { setAbsEnfantH(gap); setAbsSalarieH(0); }}
+                    className="flex-1 py-2 px-3 rounded-xl text-xs font-semibold border-2 border-orange-200 text-orange-700 bg-orange-50 hover:bg-orange-100 active:bg-orange-200 transition-colors min-h-[44px]"
+                  >
+                    {gap}h abs. enfant
+                  </button>
+                </div>
+              )}
+
+              <div className="grid grid-cols-2 gap-3">
+                {/* Abs salarié */}
+                <div>
+                  <label className="block text-xs font-medium text-gray-600 mb-1">
+                    Abs. salarié (h)
+                    <span className="ml-1 text-red-500 text-[10px] font-normal">déduit</span>
+                  </label>
+                  <input
+                    type="number"
+                    inputMode="decimal"
+                    step="0.25"
+                    min="0"
+                    max="24"
+                    value={absSalarieH}
+                    onChange={(e) => setAbsSalarieH(parseFloat(e.target.value) || 0)}
+                    className="w-full border-2 border-gray-200 rounded-xl p-3 text-base font-semibold bg-white focus:border-purple-400 focus:ring-2 focus:ring-purple-100 transition-colors min-h-[44px]"
+                  />
+                </div>
+                {/* Abs enfant */}
+                <div>
+                  <label className="block text-xs font-medium text-gray-600 mb-1">
+                    Abs. enfant (h)
+                    <span className="ml-1 text-orange-500 text-[10px] font-normal">non déduit</span>
+                  </label>
+                  <input
+                    type="number"
+                    inputMode="decimal"
+                    step="0.25"
+                    min="0"
+                    max="24"
+                    value={absEnfantH}
+                    onChange={(e) => setAbsEnfantH(parseFloat(e.target.value) || 0)}
+                    className="w-full border-2 border-gray-200 rounded-xl p-3 text-base font-semibold bg-white focus:border-purple-400 focus:ring-2 focus:ring-purple-100 transition-colors min-h-[44px]"
+                  />
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* ===== Toggles: Repas + Km ===== */}
           <div className="flex items-center gap-6">

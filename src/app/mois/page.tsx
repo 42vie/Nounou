@@ -218,13 +218,13 @@ export default function MoisPage() {
           onSave={async (jour, enfantId, data) => {
             if (!user) return;
             await saveJourData(user.uid, enfantId, annee, moisIdx, String(jour), data);
+            const updatedJours = { ...(moisData?.jours || {}), [String(jour)]: data };
             setMoisData((prev) => {
               if (!prev) return prev;
               return { ...prev, jours: { ...prev.jours, [String(jour)]: data } };
             });
             // Si CPC/CPI, mettre à jour le tableau CP de l'enfant
             if (data.commentaire === "CPC" || data.commentaire === "CPI") {
-              const updatedJours = { ...(moisData?.jours || {}), [String(jour)]: data };
               const cpcCount = Object.values(updatedJours).filter((j) => j.commentaire === "CPC").length;
               const cpiCount = Object.values(updatedJours).filter((j) => j.commentaire === "CPI").length;
               await saveCPMois(user.uid, enfantId, annee, moisIdx, {
@@ -232,6 +232,18 @@ export default function MoisPage() {
                 cpi_pris: cpiCount,
               });
             }
+            // Recalculer les totaux d'absences partielles depuis les données journalières
+            const totalAbsSalarie = Object.values(updatedJours).reduce((s, j) => s + (j.abs_salarie_h || 0), 0);
+            const totalAbsEnfant = Object.values(updatedJours).reduce((s, j) => s + (j.abs_enfant_h || 0), 0);
+            await saveMoisData(user.uid, enfantId, annee, moisIdx, {
+              absence_salarie_heures: totalAbsSalarie,
+              absence_enfant_heures: totalAbsEnfant,
+            });
+            setMoisData((prev) => prev ? {
+              ...prev,
+              absence_salarie_heures: totalAbsSalarie,
+              absence_enfant_heures: totalAbsEnfant,
+            } : prev);
           }}
           onChangeEnfant={(id) => setSelectedEnfant(id)}
           onChangeJour={(jour) => setPopupJour(jour)}
