@@ -620,20 +620,28 @@ export default function PopupJour({
                 Absences partielles
               </label>
 
-              {/* Boutons de remplissage rapide quand il y a un écart */}
+              {/* Boutons toggle : seul le bouton actif est en couleur */}
               {gap > 0 && (
                 <div className="flex gap-2">
                   <button
                     type="button"
-                    onClick={() => { setAbsSalarieH(gap); setAbsEnfantH(0); }}
-                    className="flex-1 py-2 px-3 rounded-xl text-xs font-semibold border-2 border-red-200 text-red-700 bg-red-50 hover:bg-red-100 active:bg-red-200 transition-colors min-h-[44px]"
+                    onClick={() => { setAbsSalarieH(absSalarieH > 0 ? 0 : gap); setAbsEnfantH(0); }}
+                    className={`flex-1 py-2 px-3 rounded-xl text-xs font-semibold border-2 transition-colors min-h-[44px] ${
+                      absSalarieH > 0
+                        ? "border-red-300 text-red-700 bg-red-50 hover:bg-red-100"
+                        : "border-gray-200 text-gray-400 bg-gray-50 hover:bg-gray-100"
+                    }`}
                   >
                     {gap}h abs. salarié
                   </button>
                   <button
                     type="button"
-                    onClick={() => { setAbsEnfantH(gap); setAbsSalarieH(0); }}
-                    className="flex-1 py-2 px-3 rounded-xl text-xs font-semibold border-2 border-orange-200 text-orange-700 bg-orange-50 hover:bg-orange-100 active:bg-orange-200 transition-colors min-h-[44px]"
+                    onClick={() => { setAbsEnfantH(absEnfantH > 0 ? 0 : gap); setAbsSalarieH(0); }}
+                    className={`flex-1 py-2 px-3 rounded-xl text-xs font-semibold border-2 transition-colors min-h-[44px] ${
+                      absEnfantH > 0
+                        ? "border-orange-300 text-orange-700 bg-orange-50 hover:bg-orange-100"
+                        : "border-gray-200 text-gray-400 bg-gray-50 hover:bg-gray-100"
+                    }`}
                   >
                     {gap}h abs. enfant
                   </button>
