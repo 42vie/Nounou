@@ -115,6 +115,7 @@ export function calculerAbsencesMois(
   let heuresAbsEnfant = 0; // Pour info uniquement — ANJE ne déduit pas
   let joursAbsSalarie = 0;
   let heuresAbsSalarie = 0;
+  let heuresAbsPartielleSalarie = 0; // abs_salarie_h sur les jours WORK (au taux horaire)
   let joursReellementTravailles = 0;
 
   for (const [jourStr, data] of Object.entries(jours)) {
@@ -141,36 +142,35 @@ export function calculerAbsencesMois(
       if ((data.heures || 0) > 0) {
         joursReellementTravailles++;
       }
+      // Absences partielles saisies sur un jour travaillé
+      heuresAbsPartielleSalarie += data.abs_salarie_h || 0;
     }
   }
 
   // Seuls ABS + CSS génèrent une déduction. ANJE = pas de déduction.
-  const totalJoursAbsents = joursAbsSalarie; // PAS joursAbsEnfant
-  const totalHeuresAbsentes = heuresAbsSalarie; // PAS heuresAbsEnfant
+  const totalJoursAbsents = joursAbsSalarie;
+  // Absences partielles : toujours déduites au taux horaire de base
+  const deductionPartielle = round2(heuresAbsPartielleSalarie * contrat.taux_horaire);
+  // Total affiché sur la ligne 21 = jours entiers + absences partielles
+  const totalHeuresAbsSalarie = heuresAbsSalarie + heuresAbsPartielleSalarie;
 
   let deduction: number;
   let methode: "jours" | "heures";
 
   if (contrat.annee_complete) {
-    // Année complète (52 sem) → méthode par HEURES
+    // Année complète (52 sem) → méthode par HEURES (simple : heures × taux)
+    // La fiche utilise heures_abs_salarie × taux, pas absences.deduction
     methode = "heures";
-    if (potentiel.heuresPotentiel > 0) {
-      deduction = round2(
-        contrat.salaire_mensualise * totalHeuresAbsentes / potentiel.heuresPotentiel
-      );
-    } else {
-      deduction = 0;
-    }
+    deduction = potentiel.heuresPotentiel > 0
+      ? round2(contrat.salaire_mensualise * heuresAbsSalarie / potentiel.heuresPotentiel) + deductionPartielle
+      : deductionPartielle;
   } else {
-    // Année incomplète (≤46 sem) → méthode par JOURS
+    // Année incomplète (≤46 sem) → méthode par JOURS pour ABS entiers
+    // + déduction horaire pour les absences partielles
     methode = "jours";
-    if (potentiel.joursPotentiel > 0) {
-      deduction = round2(
-        contrat.salaire_mensualise * totalJoursAbsents / potentiel.joursPotentiel
-      );
-    } else {
-      deduction = 0;
-    }
+    deduction = potentiel.joursPotentiel > 0
+      ? round2(contrat.salaire_mensualise * totalJoursAbsents / potentiel.joursPotentiel) + deductionPartielle
+      : deductionPartielle;
   }
 
   const salaireDu = round2(contrat.salaire_mensualise - deduction);
@@ -178,12 +178,12 @@ export function calculerAbsencesMois(
   return {
     methode,
     base: contrat.salaire_mensualise,
-    unites_absentes: methode === "heures" ? totalHeuresAbsentes : totalJoursAbsents,
+    unites_absentes: methode === "heures" ? totalHeuresAbsSalarie : totalJoursAbsents,
     unites_potentiel: methode === "heures" ? potentiel.heuresPotentiel : potentiel.joursPotentiel,
     deduction,
     salaire_du: salaireDu,
     heures_abs_enfant: heuresAbsEnfant,
-    heures_abs_salarie: heuresAbsSalarie,
+    heures_abs_salarie: totalHeuresAbsSalarie,
     heures_normales_pajemploi: contrat.taux_horaire > 0
       ? Math.round(salaireDu / contrat.taux_horaire)
       : 0,
