@@ -318,9 +318,51 @@ export default function FichePage() {
           ← Retour
         </button>
         <div className="flex gap-2">
-          {/* Imprimer / PDF — window.print() sur tous les appareils */}
           <button
-            onClick={() => window.print()}
+            onClick={() => {
+              const bulletinEl = document.querySelector(".bulletin");
+              if (!bulletinEl) return;
+
+              const css = `
+:root{--rose-saisie:#FFE4E1;--violet:#E9ABEB;--lavande:#E7E2F8;--violet-fonce:#CFC6F2;--violet-light:#CC99FF;}
+*{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;}
+body{font-family:Arial,Helvetica,sans-serif;background:#fff;margin:0;padding:0;}
+@page{size:A4 portrait;margin:8mm 6mm;}
+.bulletin{font-family:Arial,Helvetica,sans-serif;font-size:9px;line-height:1.3;color:#000;background:#fff;width:100%;}
+.bulletin table{border-collapse:collapse;width:100%;}
+.bulletin td,.bulletin th{border:0.5px solid #999;padding:1px 3px;vertical-align:middle;}
+.bulletin .cell-saisie{background-color:#FFE4E1;}
+.bulletin .cell-calcul{background-color:#E9ABEB;}
+.bulletin .cell-violet-light{background-color:#CC99FF;}
+.bulletin .cell-lavande{background-color:#E7E2F8;}
+.bulletin .cell-violet-fonce{background-color:#CFC6F2;}
+.bulletin .cell-negatif{color:red;}
+.bulletin .cell-brut{background-color:#E9ABEB;font-weight:bold;}
+.bulletin .cell-net{background-color:#E9ABEB;font-weight:bold;font-size:11px;}
+`;
+              const html = `<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Bulletin ${MOIS_NOMS[moisIdx]} ${annee} — ${enfant.nom}</title>
+  <style>${css}</style>
+</head>
+<body>
+  ${bulletinEl.outerHTML}
+  <script>window.addEventListener('load',()=>setTimeout(()=>window.print(),300));<\/script>
+</body>
+</html>`;
+
+              const blob = new Blob([html], { type: "text/html;charset=utf-8" });
+              const url = URL.createObjectURL(blob);
+              const win = window.open(url, "_blank");
+              if (!win) {
+                // Popup bloqué → fallback direct
+                window.print();
+              }
+              setTimeout(() => URL.revokeObjectURL(url), 60000);
+            }}
             className="px-4 py-2 bg-purple-600 text-white rounded-lg text-sm font-medium hover:bg-purple-700"
           >
             Imprimer / PDF
@@ -334,8 +376,10 @@ export default function FichePage() {
         </div>
       </div>
 
-      {/* Bulletin */}
-      <BulletinComplet
+      {/* Bulletin — scrollable horizontalement sur mobile */}
+      <div className="overflow-x-auto -mx-4 px-4 print:overflow-visible print:mx-0 print:px-0">
+        <div className="min-w-[794px] print:min-w-0">
+          <BulletinComplet
         employeur={{
           nom: enfant.emp_nom,
           adresse: enfant.emp_adresse,
@@ -446,6 +490,8 @@ export default function FichePage() {
         }}
         commentaire_mois={moisData.commentaire_mois || ""}
       />
+        </div>
+      </div>
     </div>
   );
 }
