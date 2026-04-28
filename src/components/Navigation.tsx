@@ -21,7 +21,7 @@ export function Navigation() {
 
   return (
     <nav
-      className="fixed bottom-0 inset-x-0 z-50 border-t shadow-[0_-2px_12px_rgba(0,0,0,0.1)]"
+      className="fixed bottom-0 inset-x-0 z-50 border-t shadow-[0_-2px_12px_rgba(0,0,0,0.1)] print:hidden"
       style={{ background: "#F5E6D0", borderColor: "#E8D4BC" }}
     >
       <div className="flex items-center justify-around h-[62px] max-w-2xl mx-auto px-2">

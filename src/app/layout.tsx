@@ -41,7 +41,7 @@ export default function RootLayout({
     <html lang="fr">
       <body className="min-h-screen antialiased" style={{ background: "#FAF0E6" }}>
         <AuthProvider>
-          <main className="pb-20">
+          <main className="pb-20 print:pb-0">
             {children}
           </main>
           <Navigation />
