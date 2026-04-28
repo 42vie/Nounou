@@ -91,7 +91,13 @@ export function BulletinComplet(p: BulletinCompletProps) {
       <React.Fragment key={`j${d}`}>
         <td style={{ ...c, ...b, width: "22px" }}>{inMonth ? d : ""}</td>
         <td style={{ ...VL, ...c, fontSize: "8px", width: "38px" }}>
-          {inMonth && j ? (j.heures > 0 ? fmt(j.heures) : j.commentaire || "") : ""}
+          {inMonth && j ? (
+            j.heures > 0
+              ? fmt(j.heures)
+              : (j.commentaire && j.commentaire !== "WORK")
+                ? j.commentaire
+                : ""
+          ) : ""}
         </td>
         <td style={{ ...LAV, ...c, fontSize: "8px", width: "32px" }}>
           {inMonth && j && j.heures_comp > 0 ? fmt(j.heures_comp) : ""}
