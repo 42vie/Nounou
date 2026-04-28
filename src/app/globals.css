@@ -117,10 +117,43 @@ body {
 }
 
 @media print {
-  body { background: white; }
-  .no-print { display: none !important; }
-  .bulletin { page-break-inside: avoid; }
-  /* Forcer les couleurs à l'impression */
+  @page {
+    size: A4 portrait;
+    margin: 8mm 6mm;
+  }
+
+  html {
+    background: white !important;
+  }
+
+  body {
+    background: white !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  /* Cacher tout l'UI de l'application */
+  nav,
+  .no-print,
+  header {
+    display: none !important;
+  }
+
+  /* Supprimer le padding-bottom réservé à la nav */
+  main {
+    padding-bottom: 0 !important;
+  }
+
+  /* Le bulletin occupe toute la largeur de la page */
+  .bulletin {
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    page-break-inside: avoid;
+  }
+
+  /* Forcer les couleurs et fonds à l'impression */
   * {
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
