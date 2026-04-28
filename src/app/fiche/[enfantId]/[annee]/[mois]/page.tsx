@@ -323,7 +323,11 @@ export default function FichePage() {
               const bulletinEl = document.querySelector(".bulletin");
               if (!bulletinEl) return;
 
-              // Convertir les images en base64 pour qu'elles fonctionnent hors contexte
+              // Ouvrir la fenêtre IMMÉDIATEMENT (avant tout await) pour éviter le blocage popup
+              const win = window.open("", "_blank");
+              if (!win) { window.print(); return; }
+
+              // Convertir les images en base64 (après ouverture de la fenêtre)
               let htmlContent = bulletinEl.outerHTML;
               const imgs = bulletinEl.querySelectorAll("img[src]");
               for (const img of Array.from(imgs)) {
@@ -338,7 +342,7 @@ export default function FichePage() {
                       reader.readAsDataURL(blob);
                     });
                     htmlContent = htmlContent.replace(`src="${src}"`, `src="${b64}"`);
-                  } catch { /* image non critique, on continue */ }
+                  } catch { /* image non critique */ }
                 }
               }
 
@@ -373,14 +377,9 @@ body{font-family:Arial,Helvetica,sans-serif;background:#fff;margin:0;padding:0;}
 </body>
 </html>`;
 
-              const blob = new Blob([html], { type: "text/html;charset=utf-8" });
-              const url = URL.createObjectURL(blob);
-              const win = window.open(url, "_blank");
-              if (!win) {
-                // Popup bloqué → fallback direct
-                window.print();
-              }
-              setTimeout(() => URL.revokeObjectURL(url), 60000);
+              win.document.open();
+              win.document.write(html);
+              win.document.close();
             }}
             className="px-4 py-2 bg-purple-600 text-white rounded-lg text-sm font-medium hover:bg-purple-700"
           >
