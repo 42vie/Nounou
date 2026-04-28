@@ -319,9 +319,28 @@ export default function FichePage() {
         </button>
         <div className="flex gap-2">
           <button
-            onClick={() => {
+            onClick={async () => {
               const bulletinEl = document.querySelector(".bulletin");
               if (!bulletinEl) return;
+
+              // Convertir les images en base64 pour qu'elles fonctionnent hors contexte
+              let htmlContent = bulletinEl.outerHTML;
+              const imgs = bulletinEl.querySelectorAll("img[src]");
+              for (const img of Array.from(imgs)) {
+                const src = img.getAttribute("src");
+                if (src && src.startsWith("/")) {
+                  try {
+                    const res = await fetch(src);
+                    const blob = await res.blob();
+                    const b64 = await new Promise<string>((resolve) => {
+                      const reader = new FileReader();
+                      reader.onload = () => resolve(reader.result as string);
+                      reader.readAsDataURL(blob);
+                    });
+                    htmlContent = htmlContent.replace(`src="${src}"`, `src="${b64}"`);
+                  } catch { /* image non critique, on continue */ }
+                }
+              }
 
               const css = `
 :root{--rose-saisie:#FFE4E1;--violet:#E9ABEB;--lavande:#E7E2F8;--violet-fonce:#CFC6F2;--violet-light:#CC99FF;}
@@ -349,7 +368,7 @@ body{font-family:Arial,Helvetica,sans-serif;background:#fff;margin:0;padding:0;}
   <style>${css}</style>
 </head>
 <body>
-  ${bulletinEl.outerHTML}
+  ${htmlContent}
   <script>window.addEventListener('load',()=>setTimeout(()=>window.print(),300));<\/script>
 </body>
 </html>`;
