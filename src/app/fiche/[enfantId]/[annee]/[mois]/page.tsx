@@ -318,35 +318,12 @@ export default function FichePage() {
           ← Retour
         </button>
         <div className="flex gap-2">
-          {/* Desktop: Imprimer / Mobile: Partager PDF */}
+          {/* Imprimer / PDF — window.print() sur tous les appareils */}
           <button
-            onClick={async () => {
-              // Vérifier si on est sur mobile avec Web Share API
-              if (typeof navigator !== "undefined" && navigator.share && /Mobi|Android/i.test(navigator.userAgent)) {
-                try {
-                  // Créer un blob HTML du bulletin pour le partage
-                  const bulletinEl = document.querySelector(".bulletin");
-                  if (bulletinEl) {
-                    const html = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>Bulletin ${MOIS_NOMS[moisIdx]} ${annee} - ${enfant.nom}</title><style>body{font-family:Arial;font-size:9px}table{border-collapse:collapse;width:100%}td,th{border:0.5px solid #999;padding:1px 3px}</style></head><body>${bulletinEl.innerHTML}</body></html>`;
-                    const blob = new Blob([html], { type: "text/html" });
-                    const file = new File([blob], `bulletin-${enfant.nom}-${MOIS_NOMS[moisIdx]}-${annee}.html`, { type: "text/html" });
-                    await navigator.share({
-                      title: `Bulletin ${MOIS_NOMS[moisIdx]} ${annee} - ${enfant.nom}`,
-                      files: [file],
-                    });
-                  }
-                } catch {
-                  // Fallback sur print si share échoue
-                  window.print();
-                }
-              } else {
-                window.print();
-              }
-            }}
+            onClick={() => window.print()}
             className="px-4 py-2 bg-purple-600 text-white rounded-lg text-sm font-medium hover:bg-purple-700"
           >
-            <span className="hidden md:inline">Imprimer / PDF</span>
-            <span className="md:hidden">Partager PDF</span>
+            Imprimer / PDF
           </button>
           <button
             onClick={() => router.push(`/mois`)}
