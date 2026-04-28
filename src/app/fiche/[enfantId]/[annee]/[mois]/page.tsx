@@ -143,10 +143,10 @@ export default function FichePage() {
   }
 
   // Auto-calculer depuis les jours saisis
-  const joursArray = Object.values(moisData.jours || {});
-  const joursEffectifsTravailles = joursArray.filter(
-    (j) => j.type === "work" || (j.commentaire === "WORK" && j.heures > 0)
-  ).length;
+  const joursArray = Object.values(moisData.jours || {});
+  const joursEffectifsTravailles = joursArray.filter(
+    (j) => j.heures > 0
+  ).length;
 
   // Auto-sommer heures complémentaires et supplémentaires depuis col. M et N
   let autoHeuresComp = 0;
